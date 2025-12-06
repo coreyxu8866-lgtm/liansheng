@@ -3,107 +3,397 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>联盛照明 - 官网</title>
+    <title>联胜照明 - 专业LED支架制造商</title>
     <style>
+        /* 全局样式 */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: "微软雅黑", Arial, sans-serif;
+            font-family: "微软雅黑", "PingFang SC", Arial, sans-serif;
         }
         body {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+            color: #333;
         }
-        /* 头部区域：Logo+导航 */
+        /* 头部导航 */
         .header {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 40px;
             margin-bottom: 30px;
-            flex-wrap: wrap; /* 小屏幕导航自动换行 */
+            flex-wrap: wrap;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 40px;
         }
         .logo {
-            width: 150px; /* 适配logo尺寸 */
+            width: 150px;
             height: 70px;
-            border: none; /* 去掉原有的红色边框，更美观 */
+            border: none;
         }
         .logo img {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* 保证logo完整显示，不拉伸 */
+            object-fit: contain;
         }
         .nav a {
-            color: #333; /* 改为深色更正式 */
+            color: #333;
             text-decoration: none;
             font-size: 18px;
             margin: 0 20px;
             padding: 5px 0;
             border-bottom: 2px solid transparent;
-            transition: border-color 0.3s;
+            transition: all 0.3s ease;
         }
         .nav a:hover {
-            border-bottom: 2px solid #2196F3; /*  hover时底部高亮 */
+            border-bottom: 2px solid #2196F3;
             color: #2196F3;
         }
-        /* 轮播图区域 */
+        #lang-switch {
+            padding: 8px 16px;
+            border: 1px solid #2196F3;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #fff;
+            color: #2196F3;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        #lang-switch:hover {
+            background: #2196F3;
+            color: #fff;
+        }
+        /* 轮播图 */
         .banner {
+            position: relative;
             width: 100%;
-            height: 400px; /* 增大轮播图尺寸，更美观 */
+            height: 400px;
             overflow: hidden;
             margin-bottom: 40px;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
         }
-        .banner img {
+        .banner-slider {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* 轮播图自适应容器 */
+            position: relative;
         }
-        /* 公司介绍区域 */
+        .banner-item {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+        .banner-item.active {
+            opacity: 1;
+        }
+        .banner-dots {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+        .banner-dots .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.7);
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .banner-dots .dot.active {
+            background: #ffffff;
+            transform: scale(1.2);
+        }
+        /* 公司简介（无左侧蓝条） */
         .company-intro {
             line-height: 2;
             color: #666;
             font-size: 16px;
             padding: 0 20px;
-            margin-bottom: 50px;
+            margin-bottom: 60px;
         }
         .company-intro h2 {
             color: #333;
             font-size: 24px;
             margin-bottom: 20px;
-            border-left: 4px solid #2196F3;
-            padding-left: 10px;
+            border-left: none;
+            padding-left: 0;
+        }
+        /* 核心优势模块（左对齐） */
+        .core-advantages {
+            padding: 0 20px;
+            margin-bottom: 80px;
+        }
+        .core-advantages h2 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 40px;
+            padding-left: 0;
+            text-align: left;
+        }
+        /* 图标容器 */
+        .icons-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        /* 图标卡片 */
+        .icon-card {
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+            padding: 20px;
+            background: #f0f8ff;
+            border-radius: 8px;
+            border: 1px solid #e6f4ff;
+            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.1);
+            transition: all 0.3s ease;
+        }
+        .icon-card:hover {
+            transform: translateY(-5px);
+            background: #2196F3;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+        }
+        .icon-card img {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            margin-bottom: 15px;
+            transition: none;
+        }
+        .icon-card p {
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .icon-card:hover p {
+            color: #fff;
+        }
+        /* 响应式适配 */
+        @media (max-width: 768px) {
+            .header {
+                gap: 20px;
+                justify-content: center;
+            }
+            .header-left {
+                gap: 20px;
+                justify-content: center;
+            }
+            .nav a {
+                margin: 0 10px;
+                font-size: 16px;
+            }
+            .banner {
+                height: 200px;
+            }
+            .company-intro {
+                padding: 0 10px;
+                font-size: 14px;
+            }
+            #lang-switch {
+                margin-top: 10px;
+            }
+            .icons-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .icon-card {
+                min-width: 100%;
+            }
+            .core-advantages h2 {
+                font-size: 20px;
+                margin-bottom: 30px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- 头部：Logo+导航 -->
+    <!-- 头部导航 -->
     <div class="header">
-        <div class="logo">
-            <!-- 修正图片路径：对应images文件夹下的logo图 -->
-            <img src="images/452e2527b5fb86f21132d0cc7d32ff92.jpg" alt="联盛LED公司logo">
+        <div class="header-left">
+            <div class="logo">
+                <img src="images/452e2527b5fb86f21132d0cc7d32ff92.jpg" alt="联胜LED公司logo">
+            </div>
+            <div class="nav">
+                <a href="index.html" class="trans-text" data-en="Home">首页</a>
+                <a href="products.html" class="trans-text" data-en="Product Center">产品中心</a>
+                <a href="contact.html" class="trans-text" data-en="Contact Us">联系我们</a>
+            </div>
         </div>
-        <div class="nav">
-            <a href="#">首页</a>
-            <a href="#">新闻动态</a>
-            <a href="#">产品中心</a>
-            <a href="#">联系我们</a>
-        </div>
+        <button id="lang-switch">En</button>
     </div>
 
-    <!-- 轮播图（可替换为你的产品图） -->
+    <!-- 轮播图 -->
     <div class="banner">
-        <!-- 这里先放示例图，后续替换成你的轮播图即可 -->
-        <img src="https://picsum.photos/1200/400" alt="联盛LED产品轮播图">
+        <div class="banner-slider">
+            <!-- banner-items-start -->
+<img src="images/banner/0000.jpg" alt="联盛LED轮播图1" class="banner-item active">
+<img src="images/banner/00000.jpg" alt="联盛LED轮播图2" class="banner-item ">
+<img src="images/banner/0605.jpg" alt="联盛LED轮播图3" class="banner-item ">
+<img src="images/banner/1010.jpg" alt="联盛LED轮播图4" class="banner-item ">
+<img src="images/banner/102.jpg" alt="联盛LED轮播图5" class="banner-item ">
+<img src="images/banner/104.jpg" alt="联盛LED轮播图6" class="banner-item ">
+<img src="images/banner/108.jpg" alt="联盛LED轮播图7" class="banner-item ">
+<img src="images/banner/116a4.jpg" alt="联盛LED轮播图8" class="banner-item ">
+<img src="images/banner/205.jpg" alt="联盛LED轮播图9" class="banner-item ">
+<img src="images/banner/206.jpg" alt="联盛LED轮播图10" class="banner-item ">
+<img src="images/banner/207.jpg" alt="联盛LED轮播图11" class="banner-item ">
+<img src="images/banner/218gg.jpg" alt="联盛LED轮播图12" class="banner-item ">
+<img src="images/banner/236000.jpg" alt="联盛LED轮播图13" class="banner-item ">
+<img src="images/banner/236bbb.jpg" alt="联盛LED轮播图14" class="banner-item ">
+<img src="images/banner/303.jpg" alt="联盛LED轮播图15" class="banner-item ">
+<img src="images/banner/306.jpg" alt="联盛LED轮播图16" class="banner-item ">
+<img src="images/banner/307.jpg" alt="联盛LED轮播图17" class="banner-item ">
+<img src="images/banner/3236-1.JPG" alt="联盛LED轮播图18" class="banner-item ">
+<img src="images/banner/333.jpg" alt="联盛LED轮播图19" class="banner-item ">
+<img src="images/banner/702.jpg" alt="联盛LED轮播图20" class="banner-item ">
+<img src="images/banner/705.jpg" alt="联盛LED轮播图21" class="banner-item ">
+<img src="images/banner/706.jpg" alt="联盛LED轮播图22" class="banner-item ">
+<img src="images/banner/708.jpg" alt="联盛LED轮播图23" class="banner-item ">
+<img src="images/banner/800ru.jpg" alt="联盛LED轮播图24" class="banner-item ">
+<img src="images/banner/8803000.jpg" alt="联盛LED轮播图25" class="banner-item ">
+<img src="images/banner/白底图1b.jpg" alt="联盛LED轮播图26" class="banner-item ">
+<img src="images/banner/白底图2b.jpg" alt="联盛LED轮播图27" class="banner-item ">
+<img src="images/banner/白底图4b.jpg" alt="联盛LED轮播图28" class="banner-item ">
+<img src="images/banner/白底图6.jpg" alt="联盛LED轮播图29" class="banner-item ">
+<!-- banner-items-end -->
+        </div>
+        <div class="banner-dots">
+            <!-- banner-items-start -->
+<span class="dot active" data-index="0"></span>
+<span class="dot " data-index="1"></span>
+<span class="dot " data-index="2"></span>
+<span class="dot " data-index="3"></span>
+<span class="dot " data-index="4"></span>
+<span class="dot " data-index="5"></span>
+<span class="dot " data-index="6"></span>
+<span class="dot " data-index="7"></span>
+<span class="dot " data-index="8"></span>
+<span class="dot " data-index="9"></span>
+<span class="dot " data-index="10"></span>
+<span class="dot " data-index="11"></span>
+<span class="dot " data-index="12"></span>
+<span class="dot " data-index="13"></span>
+<span class="dot " data-index="14"></span>
+<span class="dot " data-index="15"></span>
+<span class="dot " data-index="16"></span>
+<span class="dot " data-index="17"></span>
+<span class="dot " data-index="18"></span>
+<span class="dot " data-index="19"></span>
+<span class="dot " data-index="20"></span>
+<span class="dot " data-index="21"></span>
+<span class="dot " data-index="22"></span>
+<span class="dot " data-index="23"></span>
+<span class="dot " data-index="24"></span>
+<span class="dot " data-index="25"></span>
+<span class="dot " data-index="26"></span>
+<span class="dot " data-index="27"></span>
+<span class="dot " data-index="28"></span>
+<!-- banner-dots-end -->
+        </div>
     </div>
 
-    <!-- 公司详情介绍 -->
+    <!-- 公司简介 -->
     <div class="company-intro">
-        <h2>关于联盛LED</h2>
-        <p>联盛LED是专注于LED照明、显示产品研发与生产的高新技术企业，致力于为客户提供高效、节能、环保的光电器材解决方案。公司拥有专业的研发团队与现代化生产基地，产品覆盖商业照明、户外显示、工业照明等多个领域，以稳定的品质与优质的服务赢得市场认可。</p>
-        <p>自成立以来，联盛LED始终坚持“技术创新、品质为先”的理念，不断推动产品升级与行业进步，目前已与多家国内外企业建立长期合作关系，业务范围辐射全国及海外多个地区。</p>
+        <h2 class="trans-text" data-en="About Liansheng Lighting">关于联胜照明</h2>
+        <p class="trans-text" data-en="Dongguan Liansheng Lighting Electrical Appliance Co., Ltd. was established in 2013 and is located in Dongguan City, Guangdong Province. We are a professional manufacturer specializing in LED brackets.">
+            东莞市联胜照明电器有限公司成立于2013年，位于广东省东莞市，是一家专业生产LED支架的厂家。
+        </p>
+        <p class="trans-text" data-en="The company primarily produces T5/T8 LED brackets, offering a rich variety of products. These include LED tri-proof light brackets, aluminum alloy brackets, iron brackets, dustproof brackets, and grid ceiling light panels. Our brackets are solid and durable, featuring reliable quality. Every product undergoes strict quality control, as we strive to provide users with long-lasting and dependable lighting solutions.">
+            公司主要生产T5、T8 LED支架，产品种类丰富多样，包括LED三防灯支架、铝合金支架、铁支架、防尘支架与格栅灯盘等。联胜支架厚实坚固，质量可靠，每一款产品都经过严格的质量把控，努力为用户带来长久而可靠的照明体验。
+        </p>
+        <p class="trans-text" data-en="&quot;Quality First, Reputation Foremost&quot; has always been our guiding principle. For over a decade, we have earned recognition from a wide range of customers through our high-quality products, excellent reputation, and superior service. Liansheng brand brackets have been sold nationwide across China and exported to Japan, South Korea, and Southeast Asian countries. Our quality is deeply trusted by customers, and we are your trustworthy long-term partner!">
+            “质量第一，信誉至上”是我们的一贯宗旨。10多年来，凭借高质量产品、良好信誉和优质服务赢得广大客户认可，联胜支架畅销全国各地，并出口日本、韩国及东南亚等国家，品质深受客户信赖，是您可信赖的长期合作伙伴！
+        </p>
     </div>
+
+    <!-- 核心优势模块 -->
+    <div class="core-advantages">
+        <h2 class="trans-text" data-en="Core Advantages">核心优势</h2>
+        <div class="icons-container">
+            <div class="icon-card">
+                <img src="images/icons/icon1.png" alt="增值税发票" class="trans-text" data-en="13% VAT Invoice">
+                <p class="trans-text" data-en="13% VAT Invoice">13%增值税发票</p>
+            </div>
+            <div class="icon-card">
+                <img src="images/icons/icon2.png" alt="准时交货" class="trans-text" data-en="On-time Delivery">
+                <p class="trans-text" data-en="On-time Delivery">准时交货</p>
+            </div>
+            <div class="icon-card">
+                <img src="images/icons/icon3.png" alt="两年质保" class="trans-text" data-en="2-Year Warranty">
+                <p class="trans-text" data-en="2-Year Warranty">两年质保</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 轮播图逻辑
+        document.addEventListener('DOMContentLoaded', function() {
+            const bannerItems = document.querySelectorAll('.banner-item');
+            const dots = document.querySelectorAll('.dot');
+            let currentIndex = 0;
+            const intervalTime = 4000;
+
+            function switchBanner(index) {
+                if (index < 0) index = bannerItems.length - 1;
+                if (index >= bannerItems.length) index = 0;
+                bannerItems.forEach(item => item.classList.remove('active'));
+                dots.forEach(dot => dot.classList.remove('active'));
+                bannerItems[index].classList.add('active');
+                dots[index].classList.add('active');
+                currentIndex = index;
+            }
+
+            let autoPlayTimer = setInterval(() => switchBanner(currentIndex + 1), intervalTime);
+            if (dots.length > 0) {
+                dots.forEach((dot, index) => {
+                    dot.addEventListener('click', () => {
+                        clearInterval(autoPlayTimer);
+                        switchBanner(index);
+                        autoPlayTimer = setInterval(() => switchBanner(currentIndex + 1), intervalTime);
+                    });
+                });
+            }
+            const banner = document.querySelector('.banner');
+            banner.addEventListener('mouseenter', () => clearInterval(autoPlayTimer));
+            banner.addEventListener('mouseleave', () => autoPlayTimer = setInterval(() => switchBanner(currentIndex + 1), intervalTime));
+
+            // 中英文切换逻辑
+            const langSwitchBtn = document.getElementById('lang-switch');
+            const transElements = document.querySelectorAll('.trans-text');
+            let isChinese = true;
+
+            langSwitchBtn.addEventListener('click', function() {
+                if (isChinese) {
+                    transElements.forEach(el => {
+                        el.dataset.zh = el.textContent;
+                        el.textContent = el.dataset.en || el.textContent;
+                    });
+                    langSwitchBtn.textContent = '中';
+                } else {
+                    transElements.forEach(el => el.textContent = el.dataset.zh || el.textContent);
+                    langSwitchBtn.textContent = 'En';
+                }
+                isChinese = !isChinese;
+            });
+        });
+    </script>
 </body>
 </html>

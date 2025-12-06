@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>产品中心 - 联胜照明</title>
+    <style>
+        /* 全局基础样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "微软雅黑", "PingFang SC", Arial, sans-serif;
+        }
+        body {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+            background: #fff !important;
+        }
+        /* 头部导航 */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 40px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+        .logo {
+            width: 150px;
+            height: 70px;
+        }
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .nav a {
+            color: #333;
+            text-decoration: none;
+            font-size: 18px;
+            margin: 0 20px;
+            padding: 5px 0;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .nav a:hover {
+            border-bottom: 2px solid #2196F3;
+            color: #2196F3;
+        }
+        #lang-switch {
+            padding: 8px 16px;
+            border: 1px solid #2196F3;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #fff;
+            color: #2196F3;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        #lang-switch:hover {
+            background: #2196F3;
+            color: #fff;
+        }
+        /* 产品中心容器 */
+        .product-center {
+            margin: 40px 0 80px;
+            padding: 0 20px;
+        }
+        .product-center h2 {
+            font-size: 24px;
+            margin-bottom: 40px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f8ff;
+        }
+        /* 产品卡片容器 */
+        .product-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        /* 产品卡片 */
+        .product-card {
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid #e6f4ff;
+            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+        }
+        /* 产品图片区域 */
+        .product-imgs {
+            width: 100%;
+            padding-bottom: 66.67%; /* 3:2宽高比 */
+            position: relative;
+            overflow: hidden;
+            background: #f5f5f5;
+        }
+        .product-imgs img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: opacity 0.5s ease;
+            opacity: 0;
+        }
+        .product-imgs img.active {
+            opacity: 1;
+        }
+        .product-imgs .load-error {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #999;
+            font-size: 14px;
+        }
+        /* 图片切换指示器（产品卡片内） */
+        .img-indicators {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+            z-index: 10;
+        }
+        .img-indicators span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.7);
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .img-indicators span.active {
+            background: #2196F3;
+        }
+        /* 产品信息区域 */
+        .product-info {
+            padding: 20px;
+            cursor: pointer;
+        }
+        .product-info:hover {
+            background: #e6f4ff;
+        }
+        .product-info h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .product-desc {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.8;
+            white-space: pre-line;
+        }
+        /* 尺寸图模态框 - 最终样式（无左上角蓝色点） */
+        .size-modal {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            background: rgba(0, 0, 0, 0.85) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 99999 !important;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .size-modal.active {
+            opacity: 1 !important;
+            pointer-events: auto !important;
+        }
+        /* 模态框内容容器 */
+        .modal-content {
+            position: relative !important;
+            width: 80% !important;
+            height: 80% !important;
+            max-width: 1000px !important;
+            max-height: 700px !important;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        /* 图片容器 */
+        .modal-img-wrapper {
+            position: relative !important;
+            width: 100% !important;
+            height: 100% !important;
+            overflow: auto !important;
+            cursor: move !important;
+            touch-action: none !important;
+        }
+        /* 图片样式（初始适配容器，缩放突破限制） */
+        .modal-img {
+            position: relative !important;
+            display: block !important;
+            max-width: 100% !important;
+            max-height: 100% !important;
+            width: auto !important;
+            height: auto !important;
+            margin: 0 auto !important;
+            transition: transform 0.1s ease;
+        }
+        /* 模态框加载失败提示 */
+        .modal-img-error {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #333;
+            font-size: 16px;
+        }
+        /* 模态框关闭按钮 */
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #666;
+            font-size: 24px;
+            cursor: pointer;
+            user-select: none;
+            z-index: 1000000 !important;
+        }
+        .modal-close:hover {
+            color: #2196F3;
+        }
+        /* 提示文本 */
+        .modal-tip {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #666;
+            font-size: 14px;
+            user-select: none;
+        }
+        /* 彻底隐藏模态框指示器（去掉蓝色点） */
+        .modal-indicators {
+            display: none !important;
+        }
+        /* 响应式适配 */
+        @media (max-width: 768px) {
+            .header {
+                gap: 20px;
+                justify-content: center;
+            }
+            .header-left {
+                gap: 20px;
+                justify-content: center;
+            }
+            .nav a {
+                margin: 0 10px;
+                font-size: 16px;
+            }
+            #lang-switch {
+                margin-top: 10px;
+            }
+            .product-center h2 {
+                font-size: 20px;
+                margin-bottom: 30px;
+            }
+            .modal-content {
+                width: 95% !important;
+                height: 90% !important;
+            }
+            .modal-close {
+                top: 5px;
+                right: 5px;
+                font-size: 20px;
+            }
+            .modal-tip {
+                bottom: 5px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 头部导航 -->
+    <div class="header">
+        <div class="header-left">
+            <div class="logo">
+                <img src="images/452e2527b5fb86f21132d0cc7d32ff92.jpg" alt="联胜照明logo">
+            </div>
+            <div class="nav">
+                <a href="index.html">首页</a>
+                <a href="products.html">产品中心</a>
+                <a href="contact.html">联系我们</a>
+            </div>
+        </div>
+        <button id="lang-switch">En</button>
+    </div>
+
+    <!-- 产品中心 -->
+    <div class="product-center">
+        <h2>产品中心</h2>
+        <div id="product-list" class="product-list"></div>
+    </div>
+
+    <!-- 尺寸图模态框（无指示器） -->
+    <div class="size-modal" id="sizeModal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <div class="modal-indicators" id="modalIndicators"></div>
+            <div class="modal-img-wrapper" id="modalImgWrapper">
+                <img class="modal-img" id="modalImg" src="" alt="产品尺寸图">
+                <div class="modal-img-error" id="modalImgError" style="display: none;">尺寸图加载失败</div>
+            </div>
+            <div class="modal-tip">触摸板双指缩放 / 拖拽移动</div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let currentSizeImages = [];
+        let currentSizeIndex = 0;
+        let currentScale = 1;
+        let currentX = 0;
+        let currentY = 0;
+        let isDragging = false;
+        let startX = 0;
+        let startY = 0;
+        // 触摸板双指缩放变量
+        let touchStartDistance = 0;
+        let touchStartScale = 1;
+        const modalImg = document.getElementById('modalImg');
+        const modalImgWrapper = document.getElementById('modalImgWrapper');
+
+        // 核心逻辑：自动加载产品
+        document.addEventListener('DOMContentLoaded', () => {
+            const productListContainer = document.getElementById('product-list');
+
+            // 加载产品文件夹列表（清除缓存）
+            fetch('product-folders.json', { cache: 'no-cache' })
+                .then(res => {
+                    if (!res.ok) throw new Error(`产品列表加载失败（状态码：${res.status}）`);
+                    return res.json();
+                })
+                .then(PRODUCT_FOLDERS => {
+                    if (!Array.isArray(PRODUCT_FOLDERS)) throw new Error('product-folders.json格式错误（非数组）');
+                    PRODUCT_FOLDERS.forEach(productFolder => {
+                        try {
+                            loadSingleProduct(productFolder, productListContainer);
+                        } catch (err) {
+                            console.error(`加载产品【${productFolder}】失败：`, err);
+                            const errorCard = createErrorProductCard(productFolder);
+                            productListContainer.appendChild(errorCard);
+                        }
+                    });
+                })
+                .catch(err => {
+                    productListContainer.innerHTML = `<div style="text-align:center; padding:40px; color:#f00;">产品列表加载失败：${err.message}</div>`;
+                    console.error('产品列表加载异常：', err);
+                });
+
+            // 初始化模态框事件
+            initModalEvents();
+        });
+
+        // 加载单个产品（含路径转码）
+        function loadSingleProduct(productFolder, container) {
+            const detailUrl = encodeURI(`images/products/${productFolder}/p_detail.txt`);
+            fetch(detailUrl)
+                .then(res => {
+                    if (!res.ok) throw new Error('产品信息文件（p_detail.txt）不存在');
+                    return res.text();
+                })
+                .then(productDesc => {
+                    loadProductImages(productFolder)
+                        .then(images => {
+                            if (images.length === 0) throw new Error('产品主图（p_png/p1.png）不存在');
+                            const productCard = createProductCard(productFolder, images, productDesc);
+                            container.appendChild(productCard);
+                        })
+                        .catch(err => {
+                            throw new Error(`主图加载失败：${err.message}`);
+                        });
+                })
+                .catch(err => {
+                    const errorCard = createErrorProductCard(productFolder, err.message);
+                    container.appendChild(errorCard);
+                });
+        }
+
+        // 加载产品主图
+        function loadProductImages(productFolder) {
+            return new Promise(resolve => {
+                const images = [];
+                let imgIndex = 1;
+                function loadNextImg() {
+                    const rawUrl = `images/products/${productFolder}/p_png/p${imgIndex}.png`;
+                    const imgUrl = encodeURI(rawUrl);
+                    const img = new Image();
+                    img.onload = () => {
+                        images.push(imgUrl);
+                        imgIndex++;
+                        loadNextImg();
+                    };
+                    img.onerror = () => {
+                        if (imgIndex === 1) console.warn(`产品【${productFolder}】无p1.png`);
+                        resolve(images);
+                    };
+                    img.src = imgUrl;
+                }
+                loadNextImg();
+            });
+        }
+
+        // 加载尺寸图（size/p.png）
+        function loadSizeImages(productFolder) {
+            return new Promise((resolve) => {
+                const images = [];
+                const rawUrl = `images/products/${productFolder}/size/p.png`;
+                const imgUrl = encodeURI(rawUrl);
+                
+                const img = new Image();
+                img.onload = () => {
+                    console.log(`尺寸图加载成功：${imgUrl}`);
+                    images.push(imgUrl);
+                    resolve(images);
+                };
+                img.onerror = () => {
+                    console.warn(`尺寸图加载失败：${imgUrl}`);
+                    alert(`产品【${productFolder}】尺寸图不存在，请检查size/p.png`);
+                    resolve(images);
+                };
+                img.src = imgUrl;
+            });
+        }
+
+        // 生成产品卡片
+        function createProductCard(productName, imageUrls, productDesc) {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+
+            // 产品图片容器
+            const imgContainer = document.createElement('div');
+            imgContainer.className = 'product-imgs';
+            imageUrls.forEach((url, idx) => {
+                const img = document.createElement('img');
+                img.src = url;
+                img.alt = `${productName} 主图${idx+1}`;
+                img.onerror = () => {
+                    img.style.display = 'none';
+                    const errorTip = document.createElement('div');
+                    errorTip.className = 'load-error';
+                    errorTip.textContent = '图片加载失败';
+                    imgContainer.appendChild(errorTip);
+                };
+                if (idx === 0) img.classList.add('active');
+                imgContainer.appendChild(img);
+            });
+
+            // 图片切换指示器（产品卡片内）
+            const indicators = document.createElement('div');
+            indicators.className = 'img-indicators';
+            imageUrls.forEach((_, idx) => {
+                const dot = document.createElement('span');
+                if (idx === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => switchProductImg(imgContainer, indicators, idx));
+                indicators.appendChild(dot);
+            });
+            imgContainer.appendChild(indicators);
+
+            // 产品信息区域
+            const infoContainer = document.createElement('div');
+            infoContainer.className = 'product-info';
+            infoContainer.addEventListener('click', () => openSizeModal(productName));
+            
+            const title = document.createElement('h3');
+            title.textContent = productName;
+            const desc = document.createElement('div');
+            desc.className = 'product-desc';
+            desc.textContent = productDesc;
+
+            infoContainer.appendChild(title);
+            infoContainer.appendChild(desc);
+
+            card.appendChild(imgContainer);
+            card.appendChild(infoContainer);
+            return card;
+        }
+
+        // 生成错误卡片
+        function createErrorProductCard(productFolder, errorMsg = '加载失败') {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+                <div class="product-imgs" style="display:flex;align-items:center;justify-content:center;">
+                    <span class="load-error">${errorMsg}</span>
+                </div>
+                <div class="product-info">
+                    <h3>${productFolder}</h3>
+                    <div class="product-desc">请检查文件路径和格式</div>
+                </div>
+            `;
+            return card;
+        }
+
+        // 统一更新图片样式（缩放+拖拽）
+        function updateModalImgStyle() {
+            // 缩放≠1时突破容器限制
+            if (currentScale !== 1) {
+                modalImg.style.maxWidth = 'none';
+                modalImg.style.maxHeight = 'none';
+            } else {
+                modalImg.style.maxWidth = '100%';
+                modalImg.style.maxHeight = '100%';
+            }
+            // 应用变换
+            modalImg.style.transform = `translate(${currentX}px, ${currentY}px) scale(${currentScale})`;
+        }
+
+        // 计算双指距离（触摸板缩放）
+        function getTouchDistance(touches) {
+            const x = touches[0].clientX - touches[1].clientX;
+            const y = touches[0].clientY - touches[1].clientY;
+            return Math.sqrt(x * x + y * y);
+        }
+
+        // 打开尺寸图模态框（重置参数）
+        function openSizeModal(productName) {
+            const modal = document.getElementById('sizeModal');
+            const modalImgError = document.getElementById('modalImgError');
+            
+            // 重置所有参数
+            currentScale = 1;
+            currentX = 0;
+            currentY = 0;
+            modalImg.style.transform = 'none';
+            modalImg.style.maxWidth = '100%';
+            modalImg.style.maxHeight = '100%';
+            
+            modalImgError.style.display = 'none';
+
+            loadSizeImages(productName)
+                .then(sizeImages => {
+                    if (sizeImages.length === 0) {
+                        modalImgError.style.display = 'block';
+                        modalImg.style.display = 'none';
+                        return;
+                    }
+
+                    currentSizeImages = sizeImages;
+                    currentSizeIndex = 0;
+                    modalImg.src = currentSizeImages[currentSizeIndex];
+                    
+                    // 图片加载后重置状态
+                    modalImg.onload = () => {
+                        isDragging = false;
+                        touchStartDistance = 0;
+                    };
+
+                    // 激活模态框
+                    modal.classList.add('active');
+                    modal.offsetHeight; // 强制重绘
+                })
+                .catch(err => {
+                    modalImgError.style.display = 'block';
+                    modalImg.style.display = 'none';
+                    alert(`尺寸图加载失败：${err.message}`);
+                });
+        }
+
+        // 初始化模态框事件（缩放+拖拽+触摸板适配）
+        function initModalEvents() {
+            const modal = document.getElementById('sizeModal');
+            const modalClose = document.querySelector('.modal-close');
+
+            // 关闭模态框
+            modalClose.addEventListener('click', () => modal.classList.remove('active'));
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.classList.remove('active');
+            });
+
+            // 滚轮缩放（适配触摸板小增量）
+            modalImgWrapper.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const delta = (e.deltaY > 0 ? -0.1 : 0.1) * (Math.abs(e.deltaY) < 100 ? 2 : 1);
+                currentScale = Math.max(0.5, Math.min(currentScale + delta, 3));
+                updateModalImgStyle();
+            });
+
+            // 触摸板双指缩放
+            modalImgWrapper.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (e.touches.length === 2) {
+                    touchStartDistance = getTouchDistance(e.touches);
+                    touchStartScale = currentScale;
+                } else if (e.touches.length === 1) {
+                    isDragging = true;
+                    startX = e.touches[0].clientX - currentX;
+                    startY = e.touches[0].clientY - currentY;
+                }
+            });
+
+            modalImgWrapper.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                if (e.touches.length === 2) {
+                    const currentDistance = getTouchDistance(e.touches);
+                    const scaleRatio = currentDistance / touchStartDistance;
+                    currentScale = Math.max(0.5, Math.min(touchStartScale * scaleRatio, 3));
+                    updateModalImgStyle();
+                } else if (e.touches.length === 1 && isDragging) {
+                    currentX = e.touches[0].clientX - startX;
+                    currentY = e.touches[0].clientY - startY;
+                    updateModalImgStyle();
+                }
+            });
+
+            modalImgWrapper.addEventListener('touchend', () => {
+                isDragging = false;
+                touchStartDistance = 0;
+                touchStartScale = 1;
+            });
+
+            // 鼠标拖拽
+            modalImgWrapper.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                isDragging = true;
+                startX = e.clientX - currentX;
+                startY = e.clientY - currentY;
+                modalImgWrapper.style.cursor = 'grabbing';
+            });
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                currentX = e.clientX - startX;
+                currentY = e.clientY - startY;
+                updateModalImgStyle();
+            });
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+                modalImgWrapper.style.cursor = 'move';
+            });
+        }
+
+        // 切换产品主图
+        function switchProductImg(imgContainer, indicators, targetIdx) {
+            const imgs = imgContainer.querySelectorAll('img');
+            imgs.forEach((img, idx) => {
+                img.classList.toggle('active', idx === targetIdx);
+            });
+            const dots = indicators.querySelectorAll('span');
+            dots.forEach((dot, idx) => {
+                dot.classList.toggle('active', idx === targetIdx);
+            });
+        }
+
+        // 中英文切换
+        document.getElementById('lang-switch').addEventListener('click', function() {
+            const isEn = this.textContent === 'En';
+            this.textContent = isEn ? '中' : 'En';
+        });
+    </script>
+</body>
+</html>
