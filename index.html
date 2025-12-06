@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>联盛照明 - 官网</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "微软雅黑", Arial, sans-serif;
+        }
+        body {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        /* 头部区域：Logo+导航 */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            margin-bottom: 30px;
+            flex-wrap: wrap; /* 小屏幕导航自动换行 */
+        }
+        .logo {
+            width: 150px; /* 适配logo尺寸 */
+            height: 70px;
+            border: none; /* 去掉原有的红色边框，更美观 */
+        }
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* 保证logo完整显示，不拉伸 */
+        }
+        .nav a {
+            color: #333; /* 改为深色更正式 */
+            text-decoration: none;
+            font-size: 18px;
+            margin: 0 20px;
+            padding: 5px 0;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+        .nav a:hover {
+            border-bottom: 2px solid #2196F3; /*  hover时底部高亮 */
+            color: #2196F3;
+        }
+        /* 轮播图区域 */
+        .banner {
+            width: 100%;
+            height: 400px; /* 增大轮播图尺寸，更美观 */
+            overflow: hidden;
+            margin-bottom: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 轮播图自适应容器 */
+        }
+        /* 公司介绍区域 */
+        .company-intro {
+            line-height: 2;
+            color: #666;
+            font-size: 16px;
+            padding: 0 20px;
+            margin-bottom: 50px;
+        }
+        .company-intro h2 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196F3;
+            padding-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 头部：Logo+导航 -->
+    <div class="header">
+        <div class="logo">
+            <!-- 修正图片路径：对应images文件夹下的logo图 -->
+            <img src="images/452e2527b5fb86f21132d0cc7d32ff92.jpg" alt="联盛LED公司logo">
+        </div>
+        <div class="nav">
+            <a href="#">首页</a>
+            <a href="#">新闻动态</a>
+            <a href="#">产品中心</a>
+            <a href="#">联系我们</a>
+        </div>
+    </div>
+
+    <!-- 轮播图（可替换为你的产品图） -->
+    <div class="banner">
+        <!-- 这里先放示例图，后续替换成你的轮播图即可 -->
+        <img src="https://picsum.photos/1200/400" alt="联盛LED产品轮播图">
+    </div>
+
+    <!-- 公司详情介绍 -->
+    <div class="company-intro">
+        <h2>关于联盛LED</h2>
+        <p>联盛LED是专注于LED照明、显示产品研发与生产的高新技术企业，致力于为客户提供高效、节能、环保的光电器材解决方案。公司拥有专业的研发团队与现代化生产基地，产品覆盖商业照明、户外显示、工业照明等多个领域，以稳定的品质与优质的服务赢得市场认可。</p>
+        <p>自成立以来，联盛LED始终坚持“技术创新、品质为先”的理念，不断推动产品升级与行业进步，目前已与多家国内外企业建立长期合作关系，业务范围辐射全国及海外多个地区。</p>
+    </div>
+</body>
+</html>
