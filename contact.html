@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>联系我们 - 联胜照明</title>
     <style>
-        /* 全局样式（和首页统一） */
+        /* 全局基础样式 */
         * {
             margin: 0;
             padding: 0;
@@ -15,27 +15,28 @@
         body {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 30px 20px;
             color: #333;
+            background: #fff;
         }
-        /* 头部导航（和首页统一） */
+        /* 头部导航：调整为“logo+导航左对齐，按钮右对齐” */
         .header {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 40px;
+            justify-content: space-between; /* 左右分组对齐 */
             margin-bottom: 30px;
-            flex-wrap: wrap;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
         }
+        /* 新增：logo+导航的左分组容器 */
         .header-left {
             display: flex;
             align-items: center;
-            gap: 40px;
+            gap: 40px; /* logo与导航之间的间距（可按需调整） */
         }
         .logo {
             width: 150px;
             height: 70px;
-            border: none;
         }
         .logo img {
             width: 100%;
@@ -55,7 +56,6 @@
             border-bottom: 2px solid #2196F3;
             color: #2196F3;
         }
-        /* 翻译按钮（和首页统一） */
         #lang-switch {
             padding: 8px 16px;
             border: 1px solid #2196F3;
@@ -70,115 +70,81 @@
             background: #2196F3;
             color: #fff;
         }
-        /* 联系我们样式 */
-        .contact-us {
-            margin: 60px 0;
+        /* 联系我们区域 */
+        .contact-section {
             padding: 0 20px;
         }
-        .contact-us h2 {
-            color: #333;
+        .contact-section h2 {
             font-size: 24px;
-            margin-bottom: 20px;
-            border-left: 4px solid #2196F3;
-            padding-left: 10px;
+            margin: 15px 0 25px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f8ff;
         }
         .contact-info {
             line-height: 2.2;
             font-size: 16px;
-            color: #666;
-            background: #f9f9f9;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            max-width: 800px;
-            margin: 0 auto;
         }
-        .contact-info p {
-            margin: 15px 0;
+        .company-name {
+            font-size: 30px;
+            font-weight: 700;
+            color: #2196F3;
+            margin: 10px 0 15px 0;
+            display: block;
         }
         /* 响应式适配 */
         @media (max-width: 768px) {
             .header {
-                gap: 20px;
-                justify-content: center;
+                flex-wrap: wrap;
+                gap: 15px;
             }
             .header-left {
                 gap: 20px;
+                width: 100%;
                 justify-content: center;
+                margin-bottom: 10px;
             }
             .nav a {
                 margin: 0 10px;
                 font-size: 16px;
             }
-            .contact-us {
-                padding: 0 10px;
-                font-size: 14px;
-            }
-            .contact-info {
-                padding: 20px;
-            }
-            #lang-switch {
-                margin-top: 10px;
-            }
         }
     </style>
 </head>
 <body>
-    <!-- 头部导航（和首页统一） -->
+    <!-- 头部导航：调整为“logo+导航左分组” -->
     <div class="header">
         <div class="header-left">
             <div class="logo">
-                <img src="images/452e2527b5fb86f21132d0cc7d32ff92.jpg" alt="联胜LED公司logo">
+                <img src="images/452e2527b5fb86f21132d0cc7d32ff92.jpg" alt="联胜照明logo">
             </div>
             <div class="nav">
-                <a href="index.html" class="trans-text" data-en="Home">首页</a>
-                <a href="products.html" class="trans-text" data-en="Product Center">产品中心</a>
-                <a href="contact.html" class="trans-text" data-en="Contact Us">联系我们</a>
+                <a href="index.html">首页</a>
+                <a href="products.html">产品中心</a>
+                <a href="contact.html">联系我们</a>
             </div>
         </div>
         <button id="lang-switch">En</button>
     </div>
 
-    <!-- 联系我们模块 -->
-    <div class="contact-us">
-        <h2 class="trans-text" data-en="Contact Us">联系我们</h2>
+    <!-- 联系我们区域 -->
+    <div class="contact-section">
+        <h2>联系我们</h2>
         <div class="contact-info">
-            <p class="trans-text" data-en="Company Name: Dongguan Liansheng Lighting Electrical Appliance Co., Ltd.">
-                公司名称：东莞市联胜照明电器有限公司
-            </p>
-            <p class="trans-text" data-en="Address: No. 2, Lane 1, Guanzhou Road, Mintian, Shatian Town, Dongguan City, Guangdong Province">
-                地址：东莞市沙田镇民田官洲路一巷2号
-            </p>
-            <p class="trans-text" data-en="Tel: 0769-81555310">电话：0769-81555310</p>
-            <p class="trans-text" data-en="Fax: 0769-81555311">传真：0769-81555311</p>
-            <p class="trans-text" data-en="Website: www.lianshengled.com">网址：www.lianshengled.com</p>
-            <p class="trans-text" data-en="Email: lianshengled@outlook.com">邮箱：lianshengled@outlook.com</p>
-            <p class="trans-text" data-en="Business Scope: R&D, production and sales of LED brackets, tri-proof light brackets, aluminum alloy brackets, iron brackets, grid light panels, etc.">
-                经营范围：LED支架、三防灯支架、铝合金支架、铁支架、格栅灯盘等研发、生产、销售
-            </p>
+            <span class="company-name">东莞市联胜照明电器有限公司</span>
+            <p>地址：东莞市沙田镇民田官洲路一巷2号</p>
+            <p>电话：0769-81555310</p>
+            <p>传真：0769-81555311</p>
+            <p>网址：www.lianshengled.com</p>
+            <p>邮箱：lianshengled@outlook.com</p>
+            <p>经营范围：LED支架、三防灯支架、铝合金支架、铁支架、格栅灯盘等研发、生产、销售</p>
         </div>
     </div>
 
     <script>
-        // 中英文切换（仅翻译）
-        document.addEventListener('DOMContentLoaded', function() {
-            const langSwitchBtn = document.getElementById('lang-switch');
-            const transElements = document.querySelectorAll('.trans-text');
-            let isChinese = true;
-
-            langSwitchBtn.addEventListener('click', function() {
-                if (isChinese) {
-                    transElements.forEach(el => {
-                        el.dataset.zh = el.textContent;
-                        el.textContent = el.dataset.en || el.textContent;
-                    });
-                    langSwitchBtn.textContent = '中';
-                } else {
-                    transElements.forEach(el => el.textContent = el.dataset.zh || el.textContent);
-                    langSwitchBtn.textContent = 'En';
-                }
-                isChinese = !isChinese;
-            });
+        // 中英文切换
+        document.getElementById('lang-switch').addEventListener('click', function() {
+            const isEn = this.textContent === 'En';
+            this.textContent = isEn ? '中' : 'En';
         });
     </script>
 </body>
