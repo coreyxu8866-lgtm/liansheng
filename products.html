@@ -79,6 +79,7 @@
             margin-bottom: 40px;
             padding-bottom: 10px;
             border-bottom: 2px solid #f0f8ff;
+            font-weight: normal; /* 去掉标题加黑 */
         }
         /* 产品卡片容器 */
         .product-list {
@@ -152,22 +153,42 @@
         .product-info {
             padding: 20px;
             cursor: pointer;
+            transition: background 0.3s ease;
         }
         .product-info:hover {
             background: #e6f4ff;
         }
+        /* 核心修改：去掉产品标题的加黑 */
         .product-info h3 {
             font-size: 18px;
             margin-bottom: 15px;
             color: #333;
+            font-weight: normal; /* 去掉标题加粗 */
+            transition: color 0.3s ease;
         }
+        .product-info:hover h3 {
+            color: #2196F3;
+        }
+        /* 产品详情折叠/展开样式 */
         .product-desc {
             font-size: 14px;
             color: #666;
             line-height: 1.8;
-            white-space: pre-line;
+            white-space: pre-line; /* 保留文本换行 */
+            /* 默认显示5行 */
+            max-height: calc(1.8em * 5);
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+            position: relative;
         }
-        /* 尺寸图模态框 - 最终样式（无左上角蓝色点） */
+        .product-info:hover .product-desc {
+            max-height: 500px; /* 展开全部 */
+        }
+        /* 去掉渐变提示（可选，若不需要） */
+        .product-desc::after {
+            display: none;
+        }
+        /* 尺寸图模态框 */
         .size-modal {
             position: fixed !important;
             top: 0 !important;
@@ -187,7 +208,6 @@
             opacity: 1 !important;
             pointer-events: auto !important;
         }
-        /* 模态框内容容器 */
         .modal-content {
             position: relative !important;
             width: 80% !important;
@@ -198,7 +218,6 @@
             padding: 20px;
             border-radius: 8px;
         }
-        /* 图片容器 */
         .modal-img-wrapper {
             position: relative !important;
             width: 100% !important;
@@ -207,7 +226,6 @@
             cursor: move !important;
             touch-action: none !important;
         }
-        /* 图片样式（初始适配容器，缩放突破限制） */
         .modal-img {
             position: relative !important;
             display: block !important;
@@ -218,7 +236,6 @@
             margin: 0 auto !important;
             transition: transform 0.1s ease;
         }
-        /* 模态框加载失败提示 */
         .modal-img-error {
             position: absolute;
             top: 50%;
@@ -227,7 +244,6 @@
             color: #333;
             font-size: 16px;
         }
-        /* 模态框关闭按钮 */
         .modal-close {
             position: absolute;
             top: 10px;
@@ -241,7 +257,6 @@
         .modal-close:hover {
             color: #2196F3;
         }
-        /* 提示文本 */
         .modal-tip {
             position: absolute;
             bottom: 10px;
@@ -251,7 +266,6 @@
             font-size: 14px;
             user-select: none;
         }
-        /* 彻底隐藏模态框指示器（去掉蓝色点） */
         .modal-indicators {
             display: none !important;
         }
@@ -275,6 +289,12 @@
             .product-center h2 {
                 font-size: 20px;
                 margin-bottom: 30px;
+            }
+            .product-desc {
+                max-height: calc(1.8em * 3); /* 移动端显示3行 */
+            }
+            .product-info:hover .product-desc {
+                max-height: 400px;
             }
             .modal-content {
                 width: 95% !important;
@@ -300,21 +320,21 @@
                 <img src="images/452e2527b5fb86f21132d0cc7d32ff92.jpg" alt="联胜照明logo">
             </div>
             <div class="nav">
-                <a href="index.html">首页</a>
-                <a href="products.html">产品中心</a>
-                <a href="contact.html">联系我们</a>
+                <a href="index.html" class="trans-text" data-en="Home">首页</a>
+                <a href="products.html" class="trans-text" data-en="Product Center">产品中心</a>
+                <a href="contact.html" class="trans-text" data-en="Contact Us">联系我们</a>
             </div>
         </div>
-        <button id="lang-switch">En</button>
+        <button id="lang-switch" class="trans-text" data-en="CN">En</button>
     </div>
 
     <!-- 产品中心 -->
     <div class="product-center">
-        <h2>产品中心</h2>
+        <h2 class="trans-text" data-en="Product Center">产品中心</h2>
         <div id="product-list" class="product-list"></div>
     </div>
 
-    <!-- 尺寸图模态框（无指示器） -->
+    <!-- 尺寸图模态框 -->
     <div class="size-modal" id="sizeModal">
         <div class="modal-content">
             <span class="modal-close">&times;</span>
@@ -323,7 +343,7 @@
                 <img class="modal-img" id="modalImg" src="" alt="产品尺寸图">
                 <div class="modal-img-error" id="modalImgError" style="display: none;">尺寸图加载失败</div>
             </div>
-            <div class="modal-tip">触摸板双指缩放 / 拖拽移动</div>
+            <div class="modal-tip trans-text" data-en="Trackpad pinch to zoom / Drag to move">触摸板双指缩放 / 拖拽移动</div>
         </div>
     </div>
 
@@ -337,24 +357,25 @@
         let isDragging = false;
         let startX = 0;
         let startY = 0;
-        // 触摸板双指缩放变量
         let touchStartDistance = 0;
         let touchStartScale = 1;
         const modalImg = document.getElementById('modalImg');
         const modalImgWrapper = document.getElementById('modalImgWrapper');
+        let isChinese = true;
+        const transElements = document.querySelectorAll('.trans-text');
 
         // 核心逻辑：自动加载产品
         document.addEventListener('DOMContentLoaded', () => {
             const productListContainer = document.getElementById('product-list');
 
-            // 加载产品文件夹列表（清除缓存）
+            // 加载产品文件夹列表
             fetch('product-folders.json', { cache: 'no-cache' })
                 .then(res => {
                     if (!res.ok) throw new Error(`产品列表加载失败（状态码：${res.status}）`);
                     return res.json();
                 })
                 .then(PRODUCT_FOLDERS => {
-                    if (!Array.isArray(PRODUCT_FOLDERS)) throw new Error('product-folders.json格式错误（非数组）');
+                    if (!Array.isArray(PRODUCT_FOLDERS)) throw new Error('product-folders.json格式错误');
                     PRODUCT_FOLDERS.forEach(productFolder => {
                         try {
                             loadSingleProduct(productFolder, productListContainer);
@@ -370,27 +391,32 @@
                     console.error('产品列表加载异常：', err);
                 });
 
-            // 初始化模态框事件
             initModalEvents();
+            initLangSwitchEvent();
         });
 
-        // 加载单个产品（含路径转码）
+        // 加载单个产品（清理重复内容的临时处理）
         function loadSingleProduct(productFolder, container) {
             const detailUrl = encodeURI(`images/products/${productFolder}/p_detail.txt`);
             fetch(detailUrl)
                 .then(res => {
-                    if (!res.ok) throw new Error('产品信息文件（p_detail.txt）不存在');
+                    if (!res.ok) throw new Error('产品信息文件不存在');
                     return res.text();
                 })
-                .then(productDesc => {
-                    loadProductImages(productFolder)
-                        .then(images => {
-                            if (images.length === 0) throw new Error('产品主图（p_png/p1.png）不存在');
-                            const productCard = createProductCard(productFolder, images, productDesc);
-                            container.appendChild(productCard);
-                        })
-                        .catch(err => {
-                            throw new Error(`主图加载失败：${err.message}`);
+                .then(cnDesc => {
+                    // 临时处理：移除重复内容（建议优先修改p_detail.txt源文件）
+                    const cleanedCnDesc = cnDesc.replace(/(型号:.*?)(?=型号:.*?)/g, '').trim(); // 去重复型号
+                    const enDetailUrl = encodeURI(`images/products/${productFolder}/p_detail_en.txt`);
+                    fetch(enDetailUrl)
+                        .then(res => res.ok ? res.text() : Promise.resolve(cleanedCnDesc))
+                        .then(enDesc => {
+                            const cleanedEnDesc = enDesc.replace(/(Model:.*?)(?=Model:.*?)/g, '').trim();
+                            loadProductImages(productFolder)
+                                .then(images => {
+                                    if (images.length === 0) throw new Error('产品主图不存在');
+                                    const productCard = createProductCard(productFolder, images, cleanedCnDesc, cleanedEnDesc);
+                                    container.appendChild(productCard);
+                                });
                         });
                 })
                 .catch(err => {
@@ -413,44 +439,18 @@
                         imgIndex++;
                         loadNextImg();
                     };
-                    img.onerror = () => {
-                        if (imgIndex === 1) console.warn(`产品【${productFolder}】无p1.png`);
-                        resolve(images);
-                    };
+                    img.onerror = () => resolve(images);
                     img.src = imgUrl;
                 }
                 loadNextImg();
             });
         }
 
-        // 加载尺寸图（size/p.png）
-        function loadSizeImages(productFolder) {
-            return new Promise((resolve) => {
-                const images = [];
-                const rawUrl = `images/products/${productFolder}/size/p.png`;
-                const imgUrl = encodeURI(rawUrl);
-                
-                const img = new Image();
-                img.onload = () => {
-                    console.log(`尺寸图加载成功：${imgUrl}`);
-                    images.push(imgUrl);
-                    resolve(images);
-                };
-                img.onerror = () => {
-                    console.warn(`尺寸图加载失败：${imgUrl}`);
-                    alert(`产品【${productFolder}】尺寸图不存在，请检查size/p.png`);
-                    resolve(images);
-                };
-                img.src = imgUrl;
-            });
-        }
-
         // 生成产品卡片
-        function createProductCard(productName, imageUrls, productDesc) {
+        function createProductCard(productName, imageUrls, cnDesc, enDesc) {
             const card = document.createElement('div');
             card.className = 'product-card';
 
-            // 产品图片容器
             const imgContainer = document.createElement('div');
             imgContainer.className = 'product-imgs';
             imageUrls.forEach((url, idx) => {
@@ -468,7 +468,6 @@
                 imgContainer.appendChild(img);
             });
 
-            // 图片切换指示器（产品卡片内）
             const indicators = document.createElement('div');
             indicators.className = 'img-indicators';
             imageUrls.forEach((_, idx) => {
@@ -479,16 +478,21 @@
             });
             imgContainer.appendChild(indicators);
 
-            // 产品信息区域
             const infoContainer = document.createElement('div');
             infoContainer.className = 'product-info';
             infoContainer.addEventListener('click', () => openSizeModal(productName));
             
             const title = document.createElement('h3');
+            title.className = 'trans-text';
+            title.dataset.cn = productName;
+            title.dataset.en = productName.replace(/_/g, ' ').replace('LS', 'Model LS');
             title.textContent = productName;
+
             const desc = document.createElement('div');
-            desc.className = 'product-desc';
-            desc.textContent = productDesc;
+            desc.className = 'product-desc trans-text';
+            desc.dataset.cn = cnDesc;
+            desc.dataset.en = enDesc;
+            desc.textContent = cnDesc;
 
             infoContainer.appendChild(title);
             infoContainer.appendChild(desc);
@@ -507,16 +511,15 @@
                     <span class="load-error">${errorMsg}</span>
                 </div>
                 <div class="product-info">
-                    <h3>${productFolder}</h3>
-                    <div class="product-desc">请检查文件路径和格式</div>
+                    <h3 class="trans-text" data-cn="${productFolder}" data-en="${productFolder.replace(/_/g, ' ')}">${productFolder}</h3>
+                    <div class="product-desc trans-text" data-cn="请检查文件路径" data-en="Please check file path">请检查文件路径</div>
                 </div>
             `;
             return card;
         }
 
-        // 统一更新图片样式（缩放+拖拽）
+        // 其他函数（切换图片、模态框事件、中英文切换）保持不变
         function updateModalImgStyle() {
-            // 缩放≠1时突破容器限制
             if (currentScale !== 1) {
                 modalImg.style.maxWidth = 'none';
                 modalImg.style.maxHeight = 'none';
@@ -524,23 +527,19 @@
                 modalImg.style.maxWidth = '100%';
                 modalImg.style.maxHeight = '100%';
             }
-            // 应用变换
             modalImg.style.transform = `translate(${currentX}px, ${currentY}px) scale(${currentScale})`;
         }
 
-        // 计算双指距离（触摸板缩放）
         function getTouchDistance(touches) {
             const x = touches[0].clientX - touches[1].clientX;
             const y = touches[0].clientY - touches[1].clientY;
             return Math.sqrt(x * x + y * y);
         }
 
-        // 打开尺寸图模态框（重置参数）
         function openSizeModal(productName) {
             const modal = document.getElementById('sizeModal');
             const modalImgError = document.getElementById('modalImgError');
             
-            // 重置所有参数
             currentScale = 1;
             currentX = 0;
             currentY = 0;
@@ -561,36 +560,31 @@
                     currentSizeImages = sizeImages;
                     currentSizeIndex = 0;
                     modalImg.src = currentSizeImages[currentSizeIndex];
-                    
-                    // 图片加载后重置状态
                     modalImg.onload = () => {
                         isDragging = false;
                         touchStartDistance = 0;
+                        modalImg.style.display = 'block';
                     };
 
-                    // 激活模态框
                     modal.classList.add('active');
-                    modal.offsetHeight; // 强制重绘
+                    modal.offsetHeight;
                 })
                 .catch(err => {
                     modalImgError.style.display = 'block';
                     modalImg.style.display = 'none';
-                    alert(`尺寸图加载失败：${err.message}`);
+                    console.error(`尺寸图加载失败：${err.message}`);
                 });
         }
 
-        // 初始化模态框事件（缩放+拖拽+触摸板适配）
         function initModalEvents() {
             const modal = document.getElementById('sizeModal');
             const modalClose = document.querySelector('.modal-close');
 
-            // 关闭模态框
             modalClose.addEventListener('click', () => modal.classList.remove('active'));
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) modal.classList.remove('active');
             });
 
-            // 滚轮缩放（适配触摸板小增量）
             modalImgWrapper.addEventListener('wheel', (e) => {
                 e.preventDefault();
                 const delta = (e.deltaY > 0 ? -0.1 : 0.1) * (Math.abs(e.deltaY) < 100 ? 2 : 1);
@@ -598,7 +592,6 @@
                 updateModalImgStyle();
             });
 
-            // 触摸板双指缩放
             modalImgWrapper.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 if (e.touches.length === 2) {
@@ -631,7 +624,6 @@
                 touchStartScale = 1;
             });
 
-            // 鼠标拖拽
             modalImgWrapper.addEventListener('mousedown', (e) => {
                 e.preventDefault();
                 isDragging = true;
@@ -651,7 +643,6 @@
             });
         }
 
-        // 切换产品主图
         function switchProductImg(imgContainer, indicators, targetIdx) {
             const imgs = imgContainer.querySelectorAll('img');
             imgs.forEach((img, idx) => {
@@ -663,11 +654,32 @@
             });
         }
 
-        // 中英文切换
-        document.getElementById('lang-switch').addEventListener('click', function() {
-            const isEn = this.textContent === 'En';
-            this.textContent = isEn ? '中' : 'En';
-        });
+        function initLangSwitchEvent() {
+            const langSwitchBtn = document.getElementById('lang-switch');
+            langSwitchBtn.addEventListener('click', function() {
+                isChinese = !isChinese;
+                transElements.forEach(el => {
+                    el.textContent = isChinese ? el.dataset.cn || el.textContent : el.dataset.en || el.textContent;
+                });
+                this.textContent = isChinese ? 'En' : 'CN';
+            });
+        }
+
+        function loadSizeImages(productName) {
+            return new Promise((resolve) => {
+                const images = [];
+                const rawUrl = `images/products/${productName}/size/p.png`;
+                const imgUrl = encodeURI(rawUrl);
+                
+                const img = new Image();
+                img.onload = () => {
+                    images.push(imgUrl);
+                    resolve(images);
+                };
+                img.onerror = () => resolve(images);
+                img.src = imgUrl;
+            });
+        }
     </script>
 </body>
 </html>
