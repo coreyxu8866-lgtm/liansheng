@@ -18,35 +18,44 @@
             padding: 20px;
             color: #333;
         }
-        /* 头部导航 */
+        /* 头部导航（仅修改以下3处间距，其他样式完全不变） */
         .header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 40px;
+            gap: 20px; /* 【修改1】原40px→20px，缩小header整体间隙，辅助向左靠 */
             margin-bottom: 30px;
             flex-wrap: wrap;
         }
         .header-left {
             display: flex;
             align-items: center;
-            gap: 40px;
+            gap: 20px; /* 【修改2】原40px→20px，缩小logo与导航的距离，实现向左靠 */
         }
         .logo {
             width: 150px;
             height: 70px;
             border: none;
         }
+        /* 新增的logo超链接样式保持不变 */
+        .logo a {
+            display: block; /* 占满整个logo容器，点击logo任意区域均可跳转 */
+            width: 100%;
+            height: 100%;
+            text-decoration: none; /* 去掉默认下划线 */
+            border: none; /* 无额外边框 */
+        }
         .logo img {
             width: 100%;
             height: 100%;
             object-fit: contain;
+            vertical-align: middle; /* 避免图片底部留白 */
         }
         .nav a {
             color: #333;
             text-decoration: none;
             font-size: 18px;
-            margin: 0 20px;
+            margin: 0 15px; /* 【修改3】原20px→15px，缩小导航项间距，更紧凑合理 */
             padding: 5px 0;
             border-bottom: 2px solid transparent;
             transition: all 0.3s ease;
@@ -69,7 +78,7 @@
             background: #2196F3;
             color: #fff;
         }
-        /* 轮播图 */
+        /* 轮播图（完全不变） */
         .banner {
             position: relative;
             width: 100%;
@@ -118,7 +127,7 @@
             background: #ffffff;
             transform: scale(1.2);
         }
-        /* 公司简介（无左侧蓝条） */
+        /* 公司简介（完全不变） */
         .company-intro {
             line-height: 2;
             color: #666;
@@ -133,7 +142,7 @@
             border-left: none;
             padding-left: 0;
         }
-        /* 核心优势模块（左对齐） */
+        /* 核心优势模块（完全不变） */
         .core-advantages {
             padding: 0 20px;
             margin-bottom: 80px;
@@ -145,14 +154,14 @@
             padding-left: 0;
             text-align: left;
         }
-        /* 图标容器 */
+        /* 图标容器（完全不变） */
         .icons-container {
             display: flex;
             justify-content: space-between;
             gap: 30px;
             flex-wrap: wrap;
         }
-        /* 图标卡片 */
+        /* 图标卡片（完全不变） */
         .icon-card {
             flex: 1;
             min-width: 200px;
@@ -186,7 +195,7 @@
         .icon-card:hover p {
             color: #fff;
         }
-        /* 响应式适配 */
+        /* 响应式适配（完全不变） */
         @media (max-width: 768px) {
             .header {
                 gap: 20px;
@@ -225,11 +234,15 @@
     </style>
 </head>
 <body>
-    <!-- 头部导航 -->
+    <!-- 头部导航（HTML结构完全不变，仅之前已添加的logo超链接保留） -->
     <div class="header">
         <div class="header-left">
             <div class="logo">
-                <img src="images/452e2527b5fb86f21132d0cc7d32ff92.jpg" alt="联胜LED公司logo">
+                <a href="https://lianshengled.1688.com/?spm=a262cb.19918180.ljxnzqdr.3.635943354NQjVI" 
+                   target="_blank" 
+                   rel="noopener noreferrer">
+                    <img src="images/452e2527b5fb86f21132d0cc7d32ff92.jpg" alt="联胜LED公司logo">
+                </a>
             </div>
             <div class="nav">
                 <a href="index.html" class="trans-text" data-en="Home">首页</a>
@@ -240,7 +253,7 @@
         <button id="lang-switch">En</button>
     </div>
 
-    <!-- 轮播图：适配本地banner文件夹的png图片（0001.png-0005.png），轮播项与圆点数量一致 -->
+    <!-- 轮播图（完全不变） -->
     <div class="banner">
         <div class="banner-slider">
             <img src="images/banner/0001.png" alt="联盛LED轮播图1" class="banner-item active">
@@ -258,7 +271,7 @@
         </div>
     </div>
 
-    <!-- 公司简介 -->
+    <!-- 公司简介（完全不变） -->
     <div class="company-intro">
         <h2 class="trans-text" data-en="About Liansheng Lighting">关于联胜照明</h2>
         <p class="trans-text" data-en="Dongguan Liansheng Lighting Electrical Appliance Co., Ltd. was established in 2013 and is located in Dongguan City, Guangdong Province. We are a professional manufacturer specializing in LED brackets.">
@@ -272,7 +285,7 @@
         </p>
     </div>
 
-    <!-- 核心优势模块 -->
+    <!-- 核心优势模块（完全不变） -->
     <div class="core-advantages">
         <h2 class="trans-text" data-en="Core Advantages">核心优势</h2>
         <div class="icons-container">
@@ -291,6 +304,7 @@
         </div>
     </div>
 
+    <!-- JS逻辑（完全不变） -->
     <script>
         // 轮播图逻辑
         document.addEventListener('DOMContentLoaded', function() {

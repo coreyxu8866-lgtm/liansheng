@@ -91,6 +91,16 @@
             margin: 10px 0 15px 0;
             display: block;
         }
+        /* 新增：公司名称超链接样式优化，保留原有样式，添加hover效果 */
+        .company-name a {
+            color: inherit; /* 继承.company-name的蓝色，不改变原有颜色 */
+            text-decoration: none; /* 去掉默认下划线 */
+            transition: all 0.3s ease; /* 平滑过渡 */
+        }
+        .company-name a:hover {
+            color: #1976D2; /* hover时略深的蓝色，提升交互反馈 */
+            text-decoration: underline; /* hover时显示下划线，提示可点击 */
+        }
         /* 响应式适配 */
         @media (max-width: 768px) {
             .header {
@@ -106,6 +116,9 @@
             .nav a {
                 margin: 0 10px;
                 font-size: 16px;
+            }
+            .company-name {
+                font-size: 24px; /* 移动端缩小字体，适配屏幕 */
             }
         }
     </style>
@@ -126,10 +139,15 @@
         <button id="lang-switch">En</button>
     </div>
 
-    <!-- 联系我们区域 -->
+    <!-- 联系我们区域：给公司名称添加1688超链接 -->
     <div class="contact-section">
         <div class="contact-info">
-            <span class="company-name">东莞市联胜照明电器有限公司</span>
+            <!-- 核心修改：用<a>标签包裹公司名称，添加指定超链接，新窗口打开 -->
+            <span class="company-name">
+                <a href="https://lianshengled.1688.com/?spm=a262cb.19918180.ljxnzqdr.3.635943354NQjVI" target="_blank" rel="noopener noreferrer">
+                    东莞市联胜照明电器有限公司
+                </a>
+            </span>
             <p>地址：东莞市沙田镇民田官洲路一巷2号</p>
             <p>电话：0769-81555310</p>
             <p>传真：0769-81555311</p>
@@ -144,6 +162,14 @@
         document.getElementById('lang-switch').addEventListener('click', function() {
             const isEn = this.textContent === 'En';
             this.textContent = isEn ? '中' : 'En';
+            
+            // 可选优化：切换公司名称的中英文（若需要）
+            const companyNameLink = document.querySelector('.company-name a');
+            if (isEn) {
+                companyNameLink.textContent = 'Dongguan Liansheng Lighting Electrical Appliance Co., Ltd.';
+            } else {
+                companyNameLink.textContent = '东莞市联胜照明电器有限公司';
+            }
         });
     </script>
 </body>
