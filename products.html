@@ -406,46 +406,54 @@
         let isChinese = true;
         const transElements = document.querySelectorAll('.trans-text');
 
-        // 核心逻辑：自动加载产品（优化：并行加载）
+        // 核心逻辑：自动加载产品（优化：使用合并数据文件）
         document.addEventListener('DOMContentLoaded', () => {
             const productListContainer = document.getElementById('product-list');
 
-            // 加载产品文件夹列表
-            fetch('product-folders.json', { cache: 'force-cache' }) // 使用缓存加速
+            // 加载合并后的产品数据（只需1个请求）
+            fetch('products-data.json', { cache: 'force-cache' })
                 .then(res => {
-                    if (!res.ok) throw new Error(`产品列表加载失败（状态码：${res.status}）`);
+                    if (!res.ok) throw new Error(`产品数据加载失败（状态码：${res.status}）`);
                     return res.json();
                 })
-                .then(PRODUCT_FOLDERS => {
-                    if (!Array.isArray(PRODUCT_FOLDERS)) throw new Error('product-folders.json格式错误');
-                    // 优化：并行加载所有产品，但按顺序显示
-                    const loadPromises = PRODUCT_FOLDERS.map((productFolder, index) => 
-                        loadSingleProduct(productFolder, productListContainer, index)
-                            .catch(err => {
-                                console.error(`加载产品【${productFolder}】失败：`, err);
-                                return { index, card: createErrorProductCard(productFolder) };
-                            })
-                    );
-                    // 等待所有产品加载完成，然后按顺序添加到页面
-                    Promise.all(loadPromises).then(results => {
-                        // 按 index 排序
-                        results.sort((a, b) => a.index - b.index);
-                        // 按顺序添加到页面
-                        results.forEach(result => {
-                            if (result && result.card) {
-                                productListContainer.appendChild(result.card);
-                            }
-                        });
-                        console.log('所有产品加载完成');
-                        // 隐藏加载动画
-                        hideLoading();
-                        // 检查是否有产品参数，如果有则滚动到对应产品
-                        scrollToProductFromURL();
+                .then(data => {
+                    if (!data.products || !Array.isArray(data.products)) {
+                        throw new Error('products-data.json格式错误');
+                    }
+                    
+                    // 直接遍历产品数据
+                    data.products.forEach((product, index) => {
+                        try {
+                            // 构建图片 URL
+                            const imageUrls = product.images.map(img => 
+                                encodeURI(`images/products/${product.id}/p_png/${img}`)
+                            );
+                            
+                            // 直接创建产品卡片
+                            const productCard = createProductCard(
+                                product.name,
+                                imageUrls,
+                                product.description.zh,
+                                product.description.en
+                            );
+                            productListContainer.appendChild(productCard);
+                        } catch (err) {
+                            console.error(`加载产品【${product.name}】失败：`, err);
+                        }
                     });
+                    
+                    console.log('所有产品加载完成');
+                    // 隐藏加载动画
+                    hideLoading();
+                    // 初始化懒加载
+                    initLazyLoad();
+                    // 检查是否有产品参数，如果有则滚动到对应产品
+                    scrollToProductFromURL();
                 })
                 .catch(err => {
-                    productListContainer.innerHTML = `<div style="text-align:center; padding:40px; color:#f00;">产品列表加载失败：${err.message}</div>`;
-                    console.error('产品列表加载异常：', err);
+                    productListContainer.innerHTML = `<div style="text-align:center; padding:40px; color:#f00;">产品数据加载失败：${err.message}</div>`;
+                    console.error('产品数据加载异常：', err);
+                    hideLoading();
                 });
 
             initModalEvents();
@@ -584,6 +592,34 @@
             return images;
         }
 
+        // 懒加载单张图片
+        function lazyLoadImage(img) {
+            if (img && img.dataset.src && img.src !== img.dataset.src) {
+                img.src = img.dataset.src;
+                delete img.dataset.src;
+            }
+        }
+
+        // 使用 Intersection Observer 实现懒加载
+        function initLazyLoad() {
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        lazyLoadImage(img);
+                        observer.unobserve(img);
+                    }
+                });
+            }, {
+                rootMargin: '50px' // 提前 50px 开始加载
+            });
+
+            // 监听所有带有 data-src 的图片
+            document.querySelectorAll('img[data-src]').forEach(img => {
+                imageObserver.observe(img);
+            });
+        }
+
         // 生成产品卡片
         function createProductCard(productName, imageUrls, cnDesc, enDesc) {
             const card = document.createElement('div');
@@ -593,7 +629,16 @@
             imgContainer.className = 'product-imgs';
             imageUrls.forEach((url, idx) => {
                 const img = document.createElement('img');
-                img.src = url;
+                // 懒加载优化：使用 data-src 存储真实 URL，先不加载
+                if (idx === 0) {
+                    // 第一张图片立即加载
+                    img.src = url;
+                    img.classList.add('active');
+                } else {
+                    // 其他图片懒加载
+                    img.dataset.src = url;
+                    img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect fill="%23f0f8ff" width="400" height="300"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" fill="%232196F3" font-size="16"%3E加载中...%3C/text%3E%3C/svg%3E';
+                }
                 img.alt = `${productName} 主图${idx+1}`;
                 img.onerror = () => {
                     img.style.display = 'none';
@@ -602,16 +647,20 @@
                     errorTip.textContent = '图片加载失败';
                     imgContainer.appendChild(errorTip);
                 };
-                if (idx === 0) img.classList.add('active');
                 imgContainer.appendChild(img);
             });
 
+            // 添加图片切换时的懒加载
             const indicators = document.createElement('div');
             indicators.className = 'img-indicators';
             imageUrls.forEach((_, idx) => {
                 const dot = document.createElement('span');
                 if (idx === 0) dot.classList.add('active');
-                dot.addEventListener('click', () => switchProductImg(imgContainer, indicators, idx));
+                dot.addEventListener('click', () => {
+                    switchProductImg(imgContainer, indicators, idx);
+                    // 懒加载当前切换到的图片
+                    lazyLoadImage(imgContainer.querySelectorAll('img')[idx]);
+                });
                 indicators.appendChild(dot);
             });
             imgContainer.appendChild(indicators);

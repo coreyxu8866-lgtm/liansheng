@@ -1,0 +1,49 @@
+{
+  "products": [
+    {
+      "id": "LED贴片三防灯_LS_236",
+      "name": "LED贴片三防灯_LS_236",
+      "description": {
+        "zh": "型号: LS-236\n材质: PC + PC\n防水等级: IP65\n产品尺寸: 1200x98x85mm\n包装尺寸: 123.5x21.5x32cm\n规格: 0.6米20W、1.2米40W、1.5米60W\n驱动电源：莱福德\n光通量：4000Lm\n显色指数：≥80\n包装数量: 8pcs\n单个净重: 1.5Kg\n毛量: 12.8Kg\n包装方式: 中性纸箱包装 (带内盒)",
+        "en": "Model: LS-236\nMaterial: PC + PC\nWaterproof Rating: IP65\nProduct Size: 1200x98x85mm\nPackaging Size: 123.5x21.5x32cm\nSpecifications: 0.6m 20W, 1.2m 40W, 1.5m 60W\nDriver: Lifud\nLuminous Flux: 4000Lm\nColor Rendering Index: ≥80\nPackaging Quantity: 8pcs\nNet Weight: 1.5Kg\nGross Weight: 12.8Kg\nPackaging: Neutral carton packaging (with inner box)"
+      },
+      "images": ["p1.png", "p2.png", "p3.png"]
+    },
+    {
+      "id": "LED 铝合金三防支架_LS_236F",
+      "name": "LED 铝合金三防支架_LS_236F",
+      "description": {
+        "zh": "型号: LS-136F\n材质: 压铸铝+钢化玻璃罩+不锈钢扣\n防水等级: IP65\n翻盖式开启玻璃罩，带铝合金反射罩\nT8/T5款式可选，LED贴片款式可选",
+        "en": "Model: LS-136F\nMaterial: Die-cast aluminum + tempered glass cover + stainless steel buckle\nWaterproof Rating: IP65\nFlip-open glass cover with aluminum alloy reflector\nT8/T5 styles available, LED chip styles available"
+      },
+      "images": ["p1.png", "p2.png", "p3.png"]
+    },
+    {
+      "id": "LED应急三防支架_LS-218E",
+      "name": "LED应急三防支架_LS-218E",
+      "description": {
+        "zh": "型号: LS-218E\n材质: ABS+PC/PC+ PC\n防水等级: IP65\n电池类型：锂电池\n应急时长：90分钟/120分钟\n产品尺寸: 665x124x90mm\n包装尺寸: 69x27x27cm\n长度规格: 0.6米T8双管\n包装数量: 8pcs\n单个净重: 1.3Kg 毛量: 11Kg\n包装方式: 中性纸箱包装 (带内盒)\n安装方式: 吸顶安装或吊装",
+        "en": "Model: LS-218E\nMaterial: ABS+PC/PC+PC\nWaterproof Rating: IP65\nBattery Type: Lithium battery\nEmergency Duration: 90 minutes/120 minutes\nProduct Size: 665x124x90mm\nPackaging Size: 69x27x27cm\nLength Specification: 0.6m T8 double tube\nPackaging Quantity: 8pcs\nNet Weight: 1.3Kg Gross Weight: 11Kg\nPackaging: Neutral carton packaging (with inner box)\nInstallation: Ceiling mount or suspended"
+      },
+      "images": ["p1.png", "p2.png", "p3.png"]
+    },
+    {
+      "id": "LED三防支架_LS-136G",
+      "name": "LED三防支架_LS-136G",
+      "description": {
+        "zh": "型号: LS-136G\n材质: ABS + PC/PC+PC\n防水等级: IP65\n包装方式: 中性纸箱包装 (带内盒)\n安装方式: 吸顶安装或吊装",
+        "en": "Model: LS-136G\nMaterial: ABS + PC/PC+PC\nWaterproof Rating: IP65\nPackaging: Neutral carton packaging (with inner box)\nInstallation: Ceiling mount or suspended"
+      },
+      "images": ["p1.png", "p2.png", "p3.png"]
+    },
+    {
+      "id": "LED三防支架_LS-136_H",
+      "name": "LED三防支架_LS-136_H",
+      "description": {
+        "zh": "型号: LS-136H\n材质: ABS + PC/PC+PC\n防水等级: IP65\n防水圈一体成型无接头\n全PC材质达到V2阻燃级别",
+        "en": "Model: LS-136H\nMaterial: ABS + PC/PC+PC\nWaterproof Rating: IP65\nWaterproof ring is integrally formed without joints\nAll PC materials meet V2 flame retardant level"
+      },
+      "images": ["p1.png", "p2.png", "p3.png"]
+    }
+  ]
+}
