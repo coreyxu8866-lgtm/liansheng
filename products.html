@@ -364,26 +364,30 @@
         let isChinese = true;
         const transElements = document.querySelectorAll('.trans-text');
 
-        // 核心逻辑：自动加载产品
+        // 核心逻辑：自动加载产品（优化：并行加载）
         document.addEventListener('DOMContentLoaded', () => {
             const productListContainer = document.getElementById('product-list');
 
             // 加载产品文件夹列表
-            fetch('product-folders.json', { cache: 'no-cache' })
+            fetch('product-folders.json', { cache: 'force-cache' }) // 使用缓存加速
                 .then(res => {
                     if (!res.ok) throw new Error(`产品列表加载失败（状态码：${res.status}）`);
                     return res.json();
                 })
                 .then(PRODUCT_FOLDERS => {
                     if (!Array.isArray(PRODUCT_FOLDERS)) throw new Error('product-folders.json格式错误');
-                    PRODUCT_FOLDERS.forEach(productFolder => {
-                        try {
-                            loadSingleProduct(productFolder, productListContainer);
-                        } catch (err) {
-                            console.error(`加载产品【${productFolder}】失败：`, err);
-                            const errorCard = createErrorProductCard(productFolder);
-                            productListContainer.appendChild(errorCard);
-                        }
+                    // 优化：并行加载所有产品
+                    const loadPromises = PRODUCT_FOLDERS.map(productFolder => 
+                        loadSingleProduct(productFolder, productListContainer)
+                            .catch(err => {
+                                console.error(`加载产品【${productFolder}】失败：`, err);
+                                const errorCard = createErrorProductCard(productFolder);
+                                productListContainer.appendChild(errorCard);
+                            })
+                    );
+                    // 等待所有产品加载完成
+                    Promise.allSettled(loadPromises).then(() => {
+                        console.log('所有产品加载完成');
                     });
                 })
                 .catch(err => {
@@ -395,55 +399,70 @@
             initLangSwitchEvent();
         });
 
-        // 加载单个产品（清理重复内容的临时处理）
-        function loadSingleProduct(productFolder, container) {
-            const detailUrl = encodeURI(`images/products/${productFolder}/p_detail.txt`);
-            fetch(detailUrl)
-                .then(res => {
-                    if (!res.ok) throw new Error('产品信息文件不存在');
-                    return res.text();
-                })
-                .then(cnDesc => {
-                    // 临时处理：移除重复内容（建议优先修改p_detail.txt源文件）
-                    const cleanedCnDesc = cnDesc.replace(/(型号:.*?)(?=型号:.*?)/g, '').trim(); // 去重复型号
-                    const enDetailUrl = encodeURI(`images/products/${productFolder}/p_detail_en.txt`);
-                    fetch(enDetailUrl)
-                        .then(res => res.ok ? res.text() : Promise.resolve(cleanedCnDesc))
-                        .then(enDesc => {
-                            const cleanedEnDesc = enDesc.replace(/(Model:.*?)(?=Model:.*?)/g, '').trim();
-                            loadProductImages(productFolder)
-                                .then(images => {
-                                    if (images.length === 0) throw new Error('产品主图不存在');
-                                    const productCard = createProductCard(productFolder, images, cleanedCnDesc, cleanedEnDesc);
-                                    container.appendChild(productCard);
-                                });
-                        });
-                })
-                .catch(err => {
-                    const errorCard = createErrorProductCard(productFolder, err.message);
-                    container.appendChild(errorCard);
-                });
+        // 加载单个产品（优化：返回Promise并行加载）
+        async function loadSingleProduct(productFolder, container) {
+            try {
+                const detailUrl = encodeURI(`images/products/${productFolder}/p_detail.txt`);
+                const enDetailUrl = encodeURI(`images/products/${productFolder}/p_detail_en.txt`);
+                
+                // 优化：并行加载中英文描述和图片
+                const [cnDescRes, enDescRes, images] = await Promise.all([
+                    fetch(detailUrl, { cache: 'force-cache' }),
+                    fetch(enDetailUrl, { cache: 'force-cache' }).catch(() => null),
+                    loadProductImages(productFolder)
+                ]);
+                
+                if (!cnDescRes.ok) throw new Error('产品信息文件不存在');
+                if (images.length === 0) throw new Error('产品主图不存在');
+                
+                const cnDesc = await cnDescRes.text();
+                const enDesc = enDescRes && enDescRes.ok ? await enDescRes.text() : cnDesc;
+                
+                // 临时处理：移除重复内容
+                const cleanedCnDesc = cnDesc.replace(/(型号:.*?)(?=型号:.*?)/g, '').trim();
+                const cleanedEnDesc = enDesc.replace(/(Model:.*?)(?=Model:.*?)/g, '').trim();
+                
+                const productCard = createProductCard(productFolder, images, cleanedCnDesc, cleanedEnDesc);
+                container.appendChild(productCard);
+            } catch (err) {
+                const errorCard = createErrorProductCard(productFolder, err.message);
+                container.appendChild(errorCard);
+                throw err; // 重新抛出以便上层处理
+            }
         }
 
-        // 加载产品主图
-        function loadProductImages(productFolder) {
-            return new Promise(resolve => {
-                const images = [];
-                let imgIndex = 1;
-                function loadNextImg() {
-                    const rawUrl = `images/products/${productFolder}/p_png/p${imgIndex}.png`;
-                    const imgUrl = encodeURI(rawUrl);
+        // 加载产品主图（优化：并行检测多张图片）
+        async function loadProductImages(productFolder) {
+            const maxImages = 10; // 假设最多10张图片
+            const images = [];
+            
+            // 并行检测所有可能的图片
+            const checkPromises = Array.from({ length: maxImages }, (_, i) => {
+                const imgIndex = i + 1;
+                const rawUrl = `images/products/${productFolder}/p_png/p${imgIndex}.png`;
+                const imgUrl = encodeURI(rawUrl);
+                
+                return new Promise(resolve => {
                     const img = new Image();
-                    img.onload = () => {
-                        images.push(imgUrl);
-                        imgIndex++;
-                        loadNextImg();
-                    };
-                    img.onerror = () => resolve(images);
+                    img.onload = () => resolve({ index: imgIndex, url: imgUrl, exists: true });
+                    img.onerror = () => resolve({ index: imgIndex, url: imgUrl, exists: false });
                     img.src = imgUrl;
-                }
-                loadNextImg();
+                });
             });
+            
+            const results = await Promise.all(checkPromises);
+            
+            // 按顺序收集存在的图片
+            for (const result of results) {
+                if (result.exists) {
+                    images.push(result.url);
+                } else {
+                    // 遇到不存在的图片就停止（假设图片是连续的）
+                    break;
+                }
+            }
+            
+            return images;
         }
 
         // 生成产品卡片

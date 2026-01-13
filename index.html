@@ -164,9 +164,8 @@
         /* 卡片样式：固定高度+统一尺寸 */
         .icon-card {
             width: 31%; /* 三等分宽度，适配100%容器 */
-            height: 320px; /* 固定高度，确保底部对齐 */
             text-align: center;
-            padding: 15px;
+            padding: 10px; /* 恢复统一内边距 */
             background: #f0f8ff;
             border-radius: 20px;
             border: 1px solid #e6f4ff;
@@ -174,7 +173,7 @@
             transition: all 0.3s ease;
             display: flex;
             flex-direction: column;
-            justify-content: flex-end; /* 内容（图+文字）靠下，底部对齐 */
+            justify-content: center; /* 改为居中对齐，而不是底部对齐 */
         }
         .icon-card:hover {
             transform: translateY(-5px);
@@ -185,9 +184,10 @@
         /* 图片尺寸：适配固定高度的卡片 */
         .icon-card img {
             width: 100%; /* 图片占满卡片宽度 */
-            max-height: 240px; /* 限制图片高度，避免溢出 */
+            height: auto; /* 自动高度，保持比例 */
+            max-height: 200px; /* 限制最大高度 */
             object-fit: contain;
-            margin-bottom: 15px;
+            margin-bottom: 10px; /* 图片与文字间距 */
             transition: none;
         }
         .icon-card p {
@@ -195,7 +195,8 @@
             color: #333;
             font-weight: 500;
             transition: color 0.3s ease;
-            margin-top: auto; /* 文字固定在卡片底部 */
+            margin: 0; /* 移除所有外边距 */
+            padding: 0; /* 移除所有内边距 */
         }
         .icon-card:hover p {
             color: #fff;
