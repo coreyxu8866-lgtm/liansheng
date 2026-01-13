@@ -269,6 +269,42 @@
         .modal-indicators {
             display: none !important;
         }
+        /* 加载动画 */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.3s ease;
+        }
+        .loading-overlay.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #e6f4ff;
+            border-top: 4px solid #2196F3;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-text {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #666;
+        }
         /* 响应式适配 */
         @media (max-width: 768px) {
             .header {
@@ -313,6 +349,12 @@
     </style>
 </head>
 <body>
+    <!-- 加载动画 -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">正在加载产品...</div>
+    </div>
+
     <!-- 头部导航 -->
     <div class="header">
         <div class="header-left">
@@ -376,18 +418,29 @@
                 })
                 .then(PRODUCT_FOLDERS => {
                     if (!Array.isArray(PRODUCT_FOLDERS)) throw new Error('product-folders.json格式错误');
-                    // 优化：并行加载所有产品
-                    const loadPromises = PRODUCT_FOLDERS.map(productFolder => 
-                        loadSingleProduct(productFolder, productListContainer)
+                    // 优化：并行加载所有产品，但按顺序显示
+                    const loadPromises = PRODUCT_FOLDERS.map((productFolder, index) => 
+                        loadSingleProduct(productFolder, productListContainer, index)
                             .catch(err => {
                                 console.error(`加载产品【${productFolder}】失败：`, err);
-                                const errorCard = createErrorProductCard(productFolder);
-                                productListContainer.appendChild(errorCard);
+                                return { index, card: createErrorProductCard(productFolder) };
                             })
                     );
-                    // 等待所有产品加载完成
-                    Promise.allSettled(loadPromises).then(() => {
+                    // 等待所有产品加载完成，然后按顺序添加到页面
+                    Promise.all(loadPromises).then(results => {
+                        // 按 index 排序
+                        results.sort((a, b) => a.index - b.index);
+                        // 按顺序添加到页面
+                        results.forEach(result => {
+                            if (result && result.card) {
+                                productListContainer.appendChild(result.card);
+                            }
+                        });
                         console.log('所有产品加载完成');
+                        // 隐藏加载动画
+                        hideLoading();
+                        // 检查是否有产品参数，如果有则滚动到对应产品
+                        scrollToProductFromURL();
                     });
                 })
                 .catch(err => {
@@ -399,8 +452,75 @@
             initLangSwitchEvent();
         });
 
-        // 加载单个产品（优化：返回Promise并行加载）
-        async function loadSingleProduct(productFolder, container) {
+        // 隐藏加载动画
+        function hideLoading() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay) {
+                loadingOverlay.classList.add('hide');
+                // 300ms 后完全移除
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+                }, 300);
+            }
+        }
+
+        // 从 URL 参数获取产品名称并滚动到对应位置
+        function scrollToProductFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productName = urlParams.get('product');
+            
+            if (productName) {
+                console.log('需要定位的产品：', productName);
+                
+                // 稍微延迟以确保 DOM 完全渲染
+                setTimeout(() => {
+                    const productCards = document.querySelectorAll('.product-card');
+                    let targetCard = null;
+                    
+                    console.log('总共找到产品卡片数：', productCards.length);
+                    
+                    // 查找匹配的产品卡片
+                    productCards.forEach((card, index) => {
+                        const cardTitle = card.querySelector('h3');
+                        if (cardTitle) {
+                            const cardProductName = cardTitle.dataset.cn || cardTitle.textContent.trim();
+                            console.log(`产品 ${index + 1}: "${cardProductName}"`);
+                            
+                            if (cardProductName === productName) {
+                                targetCard = card;
+                                console.log(`匹配成功！产品 ${index + 1}`);
+                            }
+                        }
+                    });
+                    
+                    if (targetCard) {
+                        // 滚动到目标产品卡片
+                        targetCard.scrollIntoView({ 
+                            behavior: 'smooth', 
+                            block: 'center' 
+                        });
+                        
+                        // 添加高亮效果
+                        targetCard.style.transition = 'all 0.3s ease';
+                        targetCard.style.transform = 'scale(1.05)';
+                        targetCard.style.boxShadow = '0 4px 20px rgba(33, 150, 243, 0.5)';
+                        
+                        // 2秒后取消高亮
+                        setTimeout(() => {
+                            targetCard.style.transform = 'scale(1)';
+                            targetCard.style.boxShadow = '';
+                        }, 2000);
+                        
+                        console.log(`已定位到产品：${productName}`);
+                    } else {
+                        console.warn(`未找到产品：${productName}`);
+                    }
+                }, 800); // 增加延迟时间以确保所有产品都加载完成
+            }
+        }
+
+        // 加载单个产品（优化：返回Promise并行加载，但保持顺序）
+        async function loadSingleProduct(productFolder, container, index) {
             try {
                 const detailUrl = encodeURI(`images/products/${productFolder}/p_detail.txt`);
                 const enDetailUrl = encodeURI(`images/products/${productFolder}/p_detail_en.txt`);
@@ -423,11 +543,10 @@
                 const cleanedEnDesc = enDesc.replace(/(Model:.*?)(?=Model:.*?)/g, '').trim();
                 
                 const productCard = createProductCard(productFolder, images, cleanedCnDesc, cleanedEnDesc);
-                container.appendChild(productCard);
+                return { index, card: productCard };
             } catch (err) {
                 const errorCard = createErrorProductCard(productFolder, err.message);
-                container.appendChild(errorCard);
-                throw err; // 重新抛出以便上层处理
+                return { index, card: errorCard };
             }
         }
 

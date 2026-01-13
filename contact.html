@@ -131,45 +131,54 @@
                 <img src="images/452e2527b5fb86f21132d0cc7d32ff92.jpg" alt="联胜照明logo">
             </div>
             <div class="nav">
-                <a href="index.html">首页</a>
-                <a href="products.html">产品中心</a>
-                <a href="contact.html">联系我们</a>
+                <a href="index.html" class="trans-text" data-en="Home">首页</a>
+                <a href="products.html" class="trans-text" data-en="Product Center">产品中心</a>
+                <a href="contact.html" class="trans-text" data-en="Contact Us">联系我们</a>
             </div>
         </div>
         <button id="lang-switch">En</button>
     </div>
 
-    <!-- 联系我们区域：给公司名称添加1688超链接 -->
+    <!-- 联系我们区域：给公司名称添加1688超链接，并添加中英文切换 -->
     <div class="contact-section">
         <div class="contact-info">
             <!-- 核心修改：用<a>标签包裹公司名称，添加指定超链接，新窗口打开 -->
             <span class="company-name">
-                <a href="https://lianshengled.1688.com/?spm=a262cb.19918180.ljxnzqdr.3.635943354NQjVI" target="_blank" rel="noopener noreferrer">
+                <a href="https://lianshengled.1688.com/?spm=a262cb.19918180.ljxnzqdr.3.635943354NQjVI" target="_blank" rel="noopener noreferrer" class="trans-text" data-en="Dongguan Liansheng Lighting Electrical Appliance Co., Ltd.">
                     东莞市联胜照明电器有限公司
                 </a>
             </span>
-            <p>地址：东莞市沙田镇民田官洲路一巷2号</p>
-            <p>电话：0769-81555310</p>
-            <p>传真：0769-81555311</p>
-            <p>网址：www.lianshengled.com</p>
-            <p>邮箱：lianshengled@outlook.com</p>
-            <p>经营范围：LED支架、三防灯支架、铝合金支架、铁支架、格栅灯盘等研发、生产、销售</p>
+            <p class="trans-text" data-en="Address: No. 2, Lane 1, Guanzhou Road, Mintian, Shatian Town, Dongguan City">地址：东莞市沙田镇民田官洲路一巷2号</p>
+            <p class="trans-text" data-en="Tel: 0769-81555310">电话：0769-81555310</p>
+            <p class="trans-text" data-en="Fax: 0769-81555311">传真：0769-81555311</p>
+            <p class="trans-text" data-en="Website: www.lianshengled.com">网址：www.lianshengled.com</p>
+            <p class="trans-text" data-en="Email: lianshengled@outlook.com">邮箱：lianshengled@outlook.com</p>
+            <p class="trans-text" data-en="Business Scope: R&D, production and sales of LED brackets, tri-proof light brackets, aluminum alloy brackets, iron brackets, grid light panels, etc.">经营范围：LED支架、三防灯支架、铝合金支架、铁支架、格栅灯盘等研发、生产、销售</p>
         </div>
     </div>
 
     <script>
-        // 中英文切换
-        document.getElementById('lang-switch').addEventListener('click', function() {
-            const isEn = this.textContent === 'En';
-            this.textContent = isEn ? '中' : 'En';
-            
-            // 可选优化：切换公司名称的中英文（若需要）
-            const companyNameLink = document.querySelector('.company-name a');
-            if (isEn) {
-                companyNameLink.textContent = 'Dongguan Liansheng Lighting Electrical Appliance Co., Ltd.';
+        // 中英文切换（完整版）
+        const langSwitchBtn = document.getElementById('lang-switch');
+        const transElements = document.querySelectorAll('.trans-text');
+        let isChinese = true;
+
+        langSwitchBtn.addEventListener('click', function() {
+            if (isChinese) {
+                // 切换到英文
+                transElements.forEach(el => {
+                    el.dataset.zh = el.textContent;
+                    el.textContent = el.dataset.en || el.textContent;
+                });
+                langSwitchBtn.textContent = '中';
             } else {
-                companyNameLink.textContent = '东莞市联胜照明电器有限公司';
+                // 切换回中文
+                transElements.forEach(el => {
+                    el.textContent = el.dataset.zh || el.textContent;
+                });
+                langSwitchBtn.textContent = 'En';
             }
+            isChinese = !isChinese;
         });
     </script>
 </body>
