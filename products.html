@@ -53,10 +53,17 @@
             padding: 5px 0;
             border-bottom: 2px solid transparent;
             transition: all 0.3s ease;
+            cursor: pointer;
         }
         .nav a:hover {
             border-bottom: 2px solid #2196F3;
             color: #2196F3;
+        }
+        /* 当前页面高亮 */
+        .nav a.active {
+            border-bottom: 2px solid #2196F3;
+            color: #2196F3;
+            font-weight: 600;
         }
         #lang-switch {
             padding: 8px 16px;
@@ -366,7 +373,7 @@
             </div>
             <div class="nav">
                 <a href="index.html" class="trans-text" data-en="Home">首页</a>
-                <a href="products.html" class="trans-text" data-en="Product Center">产品中心</a>
+                <a href="products.html" class="active trans-text" data-en="Product Center">产品中心</a>
                 <a href="contact.html" class="trans-text" data-en="Contact Us">联系我们</a>
             </div>
         </div>
