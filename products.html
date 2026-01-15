@@ -356,6 +356,30 @@
                 font-size: 12px;
             }
         }
+        /* 模态框加载动画 */
+        .modal-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            z-index: 10;
+        }
+        .modal-loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e6f4ff;
+            border-top: 4px solid #2196F3;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        .modal-loading-text {
+            color: #2196F3;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -391,6 +415,11 @@
         <div class="modal-content">
             <span class="modal-close">&times;</span>
             <div class="modal-indicators" id="modalIndicators"></div>
+            <!-- 加载动画 -->
+            <div class="modal-loading" id="modalLoading">
+                <div class="modal-loading-spinner"></div>
+                <div class="modal-loading-text">正在加载尺寸图...</div>
+            </div>
             <div class="modal-img-wrapper" id="modalImgWrapper">
                 <img class="modal-img" id="modalImg" src="" alt="产品尺寸图">
                 <div class="modal-img-error" id="modalImgError" style="display: none;">尺寸图加载失败</div>
@@ -628,6 +657,26 @@
             document.querySelectorAll('img[data-src]').forEach(img => {
                 imageObserver.observe(img);
             });
+            
+            // 预加载尺寸图（产品卡片可见时）
+            const cardObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const card = entry.target;
+                        const productName = card.querySelector('h3').textContent;
+                        // 预加载尺寸图（静默加载，不显示）
+                        preloadSizeImage(productName);
+                        cardObserver.unobserve(card);
+                    }
+                });
+            }, {
+                rootMargin: '200px' // 提前 200px 预加载
+            });
+            
+            // 监听所有产品卡片
+            document.querySelectorAll('.product-card').forEach(card => {
+                cardObserver.observe(card);
+            });
         }
 
         // 生成产品卡片
@@ -736,7 +785,9 @@
         function openSizeModal(productName) {
             const modal = document.getElementById('sizeModal');
             const modalImgError = document.getElementById('modalImgError');
+            const modalLoading = document.getElementById('modalLoading');
             
+            // 重置状态
             currentScale = 1;
             currentX = 0;
             currentY = 0;
@@ -744,10 +795,21 @@
             modalImg.style.maxWidth = '100%';
             modalImg.style.maxHeight = '100%';
             
+            // 隐藏错误和图片，显示Loading
             modalImgError.style.display = 'none';
+            modalImg.style.display = 'none';
+            modalLoading.style.display = 'flex';
+            
+            // 立即打开模态框（用户看到loading）
+            modal.classList.add('active');
+            modal.offsetHeight; // 触发重绘
 
+            // 后台加载尺寸图
             loadSizeImages(productName)
                 .then(sizeImages => {
+                    // 隐藏Loading
+                    modalLoading.style.display = 'none';
+                    
                     if (sizeImages.length === 0) {
                         modalImgError.style.display = 'block';
                         modalImg.style.display = 'none';
@@ -762,11 +824,9 @@
                         touchStartDistance = 0;
                         modalImg.style.display = 'block';
                     };
-
-                    modal.classList.add('active');
-                    modal.offsetHeight;
                 })
                 .catch(err => {
+                    modalLoading.style.display = 'none';
                     modalImgError.style.display = 'block';
                     modalImg.style.display = 'none';
                     console.error(`尺寸图加载失败：${err.message}`);
@@ -876,6 +936,16 @@
                 img.onerror = () => resolve(images);
                 img.src = imgUrl;
             });
+        }
+
+        // 预加载尺寸图（静默加载，缓存到浏览器）
+        function preloadSizeImage(productName) {
+            const rawUrl = `images/products/${productName}/size/p.png`;
+            const imgUrl = encodeURI(rawUrl);
+            
+            const img = new Image();
+            img.src = imgUrl; // 触发加载，浏览器会缓存
+            // 静默加载，不需要处理结果
         }
     </script>
 </body>
