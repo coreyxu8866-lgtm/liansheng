@@ -458,7 +458,6 @@
                 const activeItem = document.querySelector('.banner-item.active');
                 if (activeItem) {
                     const productName = activeItem.dataset.product;
-                    console.log(`点击轮播图，当前显示：`, activeItem.alt, `产品：`, productName);
                     if (productName) {
                         // 跳转到产品中心页面，并带上产品名称参数
                         window.location.href = `products.html?product=${encodeURIComponent(productName)}`;

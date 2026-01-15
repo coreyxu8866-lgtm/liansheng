@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>产品中心 - 联胜照明</title>
+    <!-- 版本: v2.0 - 修复模态框交互 -->
     <!-- 添加 favicon -->
     <link rel="icon" type="image/jpeg" href="images/452e2527b5fb86f21132d0cc7d32ff92.jpg">
     <link rel="shortcut icon" type="image/jpeg" href="images/452e2527b5fb86f21132d0cc7d32ff92.jpg">
@@ -231,8 +232,8 @@
         .modal-img-wrapper {
             position: relative !important;
             width: 100% !important;
-            height: 100% !important;
-            overflow: auto !important;
+            height: calc(100% - 30px) !important;
+            overflow: hidden !important;
             cursor: move !important;
             touch-action: none !important;
         }
@@ -256,16 +257,27 @@
         }
         .modal-close {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            color: #666;
-            font-size: 24px;
+            top: -15px;
+            right: -15px;
+            width: 40px;
+            height: 40px;
+            background: rgba(33, 150, 243, 0.9);
+            color: #fff;
+            font-size: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
             user-select: none;
-            z-index: 1000000 !important;
+            z-index: 999999;
+            pointer-events: auto;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
         .modal-close:hover {
-            color: #2196F3;
+            background: rgba(33, 150, 243, 1);
+            transform: scale(1.1);
         }
         .modal-tip {
             position: absolute;
@@ -445,59 +457,102 @@
         let isChinese = true;
         const transElements = document.querySelectorAll('.trans-text');
 
-        // 核心逻辑：自动加载产品（优化：使用合并数据文件）
+        // 核心逻辑：自动加载产品（优化：使用合并数据文件 + LocalStorage）
         document.addEventListener('DOMContentLoaded', () => {
             const productListContainer = document.getElementById('product-list');
+            
+            // 先初始化模态框事件（重要！）
+            initModalEvents();
+            initLangSwitchEvent();
 
-            // 加载合并后的产品数据（只需1个请求）
+            // 优先从 LocalStorage 加载
+            try {
+                const localData = localStorage.getItem('productsData');
+                if (localData) {
+                    const data = JSON.parse(localData);
+
+                    renderProducts(data, productListContainer);
+                    return;
+                }
+            } catch (error) {
+
+            }
+
+            // 如果 LocalStorage 没有数据，从 JSON 文件加载
             fetch('products-data.json', { cache: 'force-cache' })
                 .then(res => {
                     if (!res.ok) throw new Error(`产品数据加载失败（状态码：${res.status}）`);
                     return res.json();
                 })
                 .then(data => {
-                    if (!data.products || !Array.isArray(data.products)) {
-                        throw new Error('products-data.json格式错误');
-                    }
-                    
-                    // 直接遍历产品数据
-                    data.products.forEach((product, index) => {
-                        try {
-                            // 构建图片 URL
-                            const imageUrls = product.images.map(img => 
-                                encodeURI(`images/products/${product.id}/p_png/${img}`)
-                            );
-                            
-                            // 直接创建产品卡片
-                            const productCard = createProductCard(
-                                product.name,
-                                imageUrls,
-                                product.description.zh,
-                                product.description.en
-                            );
-                            productListContainer.appendChild(productCard);
-                        } catch (err) {
-                            console.error(`加载产品【${product.name}】失败：`, err);
-                        }
-                    });
-                    
-                    console.log('所有产品加载完成');
-                    // 隐藏加载动画
-                    hideLoading();
-                    // 初始化懒加载
-                    initLazyLoad();
-                    // 检查是否有产品参数，如果有则滚动到对应产品
-                    scrollToProductFromURL();
+                    renderProducts(data, productListContainer);
                 })
                 .catch(err => {
                     productListContainer.innerHTML = `<div style="text-align:center; padding:40px; color:#f00;">产品数据加载失败：${err.message}</div>`;
-                    console.error('产品数据加载异常：', err);
+
                     hideLoading();
                 });
-
-            initModalEvents();
-            initLangSwitchEvent();
         });
+        
+        // 渲染产品列表
+        function renderProducts(data, productListContainer) {
+            if (!data.products || !Array.isArray(data.products)) {
+                throw new Error('products-data.json格式错误');
+            }
+            
+            // 直接遍历产品数据
+            data.products.forEach((product, index) => {
+                try {
+
+                    
+                    // 构建图片 URL
+                    let imageUrls = [];
+                    
+                    // 判断图片是 Base64 格式还是文件路径
+                    if (product.imagesBase64 && product.images && product.images.length > 0) {
+                        // Base64 格式的图片，直接使用
+                        imageUrls = product.images;
+
+                    } else if (product.images && product.images.length > 0) {
+                        // 文件路径格式的图片
+                        imageUrls = product.images.map(img => 
+                            encodeURI(`images/products/${product.id}/p_png/${img}`)
+                        );
+
+                    } else {
+                        // 如果没有图片，使用占位图
+                        const placeholderSvg = `
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+                                <rect fill="#f0f8ff" width="400" height="300"/>
+                                <text x="50%" y="45%" text-anchor="middle" fill="#999" font-size="18">暂无图片</text>
+                                <text x="50%" y="60%" text-anchor="middle" fill="#ccc" font-size="14">${product.name}</text>
+                            </svg>
+                        `;
+                        imageUrls = [`data:image/svg+xml;charset=utf-8,${encodeURIComponent(placeholderSvg)}`];
+
+                    }
+                    
+                    // 直接创建产品卡片
+                    const productCard = createProductCard(
+                        product.name,
+                        imageUrls,
+                        product.description.zh,
+                        product.description.en
+                    );
+                    productListContainer.appendChild(productCard);
+                } catch (err) {
+                    // 产品加载失败，静默忽略
+                }
+            });
+            
+
+            // 隐藏加载动画
+            hideLoading();
+            // 初始化懒加载
+            initLazyLoad();
+            // 检查是否有产品参数，如果有则滚动到对应产品
+            scrollToProductFromURL();
+        }
 
         // 隐藏加载动画
         function hideLoading() {
@@ -517,25 +572,19 @@
             const productName = urlParams.get('product');
             
             if (productName) {
-                console.log('需要定位的产品：', productName);
-                
                 // 稍微延迟以确保 DOM 完全渲染
                 setTimeout(() => {
                     const productCards = document.querySelectorAll('.product-card');
                     let targetCard = null;
-                    
-                    console.log('总共找到产品卡片数：', productCards.length);
                     
                     // 查找匹配的产品卡片
                     productCards.forEach((card, index) => {
                         const cardTitle = card.querySelector('h3');
                         if (cardTitle) {
                             const cardProductName = cardTitle.dataset.cn || cardTitle.textContent.trim();
-                            console.log(`产品 ${index + 1}: "${cardProductName}"`);
                             
                             if (cardProductName === productName) {
                                 targetCard = card;
-                                console.log(`匹配成功！产品 ${index + 1}`);
                             }
                         }
                     });
@@ -557,10 +606,6 @@
                             targetCard.style.transform = 'scale(1)';
                             targetCard.style.boxShadow = '';
                         }, 2000);
-                        
-                        console.log(`已定位到产品：${productName}`);
-                    } else {
-                        console.warn(`未找到产品：${productName}`);
                     }
                 }, 800); // 增加延迟时间以确保所有产品都加载完成
             }
@@ -700,11 +745,16 @@
                 }
                 img.alt = `${productName} 主图${idx+1}`;
                 img.onerror = () => {
-                    img.style.display = 'none';
-                    const errorTip = document.createElement('div');
-                    errorTip.className = 'load-error';
-                    errorTip.textContent = '图片加载失败';
-                    imgContainer.appendChild(errorTip);
+                    // 图片加载失败时显示占位图
+                    const placeholderSvg = `
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+                            <rect fill="#f0f8ff" width="400" height="300"/>
+                            <text x="50%" y="45%" text-anchor="middle" fill="#999" font-size="18">暂无图片</text>
+                            <text x="50%" y="60%" text-anchor="middle" fill="#ccc" font-size="14">${productName}</text>
+                        </svg>
+                    `;
+                    img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(placeholderSvg)}`;
+                    img.style.display = 'block';
                 };
                 imgContainer.appendChild(img);
             });
@@ -764,7 +814,6 @@
             return card;
         }
 
-        // 其他函数（切换图片、模态框事件、中英文切换）保持不变
         function updateModalImgStyle() {
             if (currentScale !== 1) {
                 modalImg.style.maxWidth = 'none';
@@ -820,7 +869,7 @@
                     currentSizeIndex = 0;
                     modalImg.src = currentSizeImages[currentSizeIndex];
                     modalImg.onload = () => {
-                        isDragging = false;
+isDragging = false;
                         touchStartDistance = 0;
                         modalImg.style.display = 'block';
                     };
@@ -829,19 +878,33 @@
                     modalLoading.style.display = 'none';
                     modalImgError.style.display = 'block';
                     modalImg.style.display = 'none';
-                    console.error(`尺寸图加载失败：${err.message}`);
                 });
         }
 
         function initModalEvents() {
             const modal = document.getElementById('sizeModal');
             const modalClose = document.querySelector('.modal-close');
+            const modalImgWrapper = document.getElementById('modalImgWrapper');
+            const modalImg = document.getElementById('modalImg');
+            
+            if (!modal || !modalClose || !modalImgWrapper || !modalImg) {
+                return;
+            }
 
-            modalClose.addEventListener('click', () => modal.classList.remove('active'));
+            // 关闭按钮点击事件
+            modalClose.addEventListener('click', (e) => {
+                e.stopPropagation();
+                modal.classList.remove('active');
+            });
+            
+            // 点击模态框背景关闭
             modal.addEventListener('click', (e) => {
-                if (e.target === modal) modal.classList.remove('active');
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
             });
 
+            // 鼠标滚轮缩放
             modalImgWrapper.addEventListener('wheel', (e) => {
                 e.preventDefault();
                 const delta = (e.deltaY > 0 ? -0.1 : 0.1) * (Math.abs(e.deltaY) < 100 ? 2 : 1);
@@ -849,6 +912,7 @@
                 updateModalImgStyle();
             });
 
+            // 触摸开始
             modalImgWrapper.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 if (e.touches.length === 2) {
@@ -861,6 +925,7 @@
                 }
             });
 
+            // 触摸移动
             modalImgWrapper.addEventListener('touchmove', (e) => {
                 e.preventDefault();
                 if (e.touches.length === 2) {
@@ -875,12 +940,14 @@
                 }
             });
 
+            // 触摸结束
             modalImgWrapper.addEventListener('touchend', () => {
                 isDragging = false;
                 touchStartDistance = 0;
                 touchStartScale = 1;
             });
 
+            // 鼠标拖拽 - 在图片上按下
             modalImgWrapper.addEventListener('mousedown', (e) => {
                 e.preventDefault();
                 isDragging = true;
@@ -888,15 +955,21 @@
                 startY = e.clientY - currentY;
                 modalImgWrapper.style.cursor = 'grabbing';
             });
+            
+            // 鼠标移动 - 全局监听
             document.addEventListener('mousemove', (e) => {
                 if (!isDragging) return;
                 currentX = e.clientX - startX;
                 currentY = e.clientY - startY;
                 updateModalImgStyle();
             });
+            
+            // 鼠标释放 - 全局监听
             document.addEventListener('mouseup', () => {
-                isDragging = false;
-                modalImgWrapper.style.cursor = 'move';
+                if (isDragging) {
+                    isDragging = false;
+                    modalImgWrapper.style.cursor = 'move';
+                }
             });
         }
 
@@ -924,6 +997,24 @@
 
         function loadSizeImages(productName) {
             return new Promise((resolve) => {
+                // 从 LocalStorage 加载产品数据
+                try {
+                    const localData = localStorage.getItem('productsData');
+                    if (localData) {
+                        const data = JSON.parse(localData);
+                        const product = data.products.find(p => p.name === productName);
+                        
+                        // 如果找到产品并且有 Base64 详情图
+                        if (product && product.sizeImageBase64 && product.sizeImage) {
+                            resolve([product.sizeImage]);
+                            return;
+                        }
+                    }
+                } catch (error) {
+                    // 静默失败
+                }
+                
+                // 如果 LocalStorage 没有，尝试从文件加载
                 const images = [];
                 const rawUrl = `images/products/${productName}/size/p.png`;
                 const imgUrl = encodeURI(rawUrl);

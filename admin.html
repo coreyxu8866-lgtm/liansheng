@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>产品管理后台 - 联胜照明</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: "微软雅黑", "PingFang SC", Arial, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            padding: 0;
+        }
+        
+        /* 登录页面样式 */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #2196F3 0%, #00BCD4 100%);
+        }
+        
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .login-header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .login-header p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .login-form {
+            margin-top: 20px;
+        }
+        
+        .login-input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+        
+        .login-input:focus {
+            outline: none;
+            border-color: #2196F3;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #2196F3 0%, #00BCD4 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .login-error {
+            color: #f44336;
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+        
+        .login-error.show {
+            display: block;
+        }
+        
+        /* 管理页面样式 */
+        .admin-page {
+            display: none;
+            padding: 20px;
+        }
+        
+        .admin-page.show {
+            display: block;
+        }
+        
+        .admin-header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .admin-content {
+            /* 移除网格布局，改为普通布局 */
+        }
+        
+        .form-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .preview-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        
+        .image-upload {
+            border: 2px dashed #ddd;
+            padding: 20px;
+            text-align: center;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        
+        .image-upload:hover {
+            border-color: #2196F3;
+        }
+        
+        .image-preview {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .image-preview img {
+            width: 80px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .btn-primary {
+            background: #2196F3;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1976D2;
+        }
+        
+        .btn-success {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #45a049;
+        }
+        
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #da190b;
+        }
+        
+        .product-list {
+            margin-top: 20px;
+        }
+        
+        .product-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #2196F3;
+        }
+        
+        .product-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+        
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: #4CAF50;
+        }
+        
+        .notification.error {
+            background: #f44336;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            background: #f8f9fa;
+            border-radius: 4px 4px 0 0;
+            margin-right: 5px;
+        }
+        
+        .tab.active {
+            background: white;
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+            font-weight: bold;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* JSON 代码模态框 */
+        .json-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .json-modal.show {
+            display: flex;
+        }
+        
+        .json-modal-content {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 80vh;
+            overflow: auto;
+            position: relative;
+        }
+        
+        .json-modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .json-modal-close:hover {
+            color: #333;
+        }
+        
+        .json-code {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre;
+            overflow-x: auto;
+            border: 1px solid #ddd;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .copy-btn {
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 登录页面 -->
+    <div class="login-container" id="loginPage">
+        <div class="login-box">
+            <div class="login-header">
+                <h1>🔒 管理员登录</h1>
+                <p>联胜照明产品管理后台</p>
+            </div>
+            <div class="login-form">
+                <input 
+                    type="tel" 
+                    id="phoneInput" 
+                    class="login-input" 
+                    placeholder="请输入管理员手机号" 
+                    maxlength="11"
+                    onkeypress="if(event.key === 'Enter') handleLogin()"
+                >
+                <button class="login-btn" onclick="handleLogin()">登录</button>
+                <div class="login-error" id="loginError">手机号错误，请联系管理员获取权限</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 管理页面 -->
+    <div class="admin-page" id="adminPage">
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>产品管理后台</h1>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-primary" onclick="showJsonCode()">生成代码</button>
+                <button class="btn btn-success" onclick="saveProducts()">下载 JSON</button>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('add')">添加新产品</div>
+            <div class="tab" onclick="switchTab('manage')">管理现有产品</div>
+        </div>
+        
+        <div class="admin-content">
+            <div class="form-section tab-content active" id="add-tab">
+                <h2>添加新产品</h2>
+                <div class="form-group">
+                    <label for="productName">产品名称 *</label>
+                    <input type="text" id="productName" placeholder="请输入产品名称（如：LED贴片三防灯_LS_236）" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="productDescriptionZh">产品描述 *</label>
+                    <textarea id="productDescriptionZh" placeholder="请输入产品描述，每行一个特性" required></textarea>
+                </div>
+                
+               <div class="form-group">
+                    <label>产品轮播图</label>
+                    <div class="image-upload" onclick="document.getElementById('imageUpload').click()">
+                        <p>点击上传图片或拖拽图片到此处</p>
+                        <input type="file" id="imageUpload" multiple accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+                    </div>
+                    <div class="image-preview" id="imagePreview"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label>产品详情图（尺寸图）</label>
+                    <div class="image-upload" onclick="document.getElementById('sizeImageUpload').click()">
+                        <p>点击上传详情图（只能上传1张）</p>
+                        <input type="file" id="sizeImageUpload" accept="image/*" style="display: none;" onchange="handleSizeImageUpload(event)">
+                    </div>
+                    <div class="image-preview" id="sizeImagePreview"></div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="addProduct()">添加产品</button>
+            </div>
+            
+            <div class="preview-section tab-content" id="manage-tab">
+                <h2>管理现有产品</h2>
+                <div class="product-list" id="productList">
+                    <!-- 产品列表将动态加载 -->
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+    
+    <!-- JSON 代码模态框 -->
+    <div class="json-modal" id="jsonModal">
+        <div class="json-modal-content">
+            <span class="json-modal-close" onclick="closeJsonModal()">&times;</span>
+            <h2>产品数据 JSON 代码</h2>
+            <p style="color: #666; margin-bottom: 15px;">复制下面的代码，粘贴到 VS Code 中的 products-data.json 文件，保存后刷新产品页面即可。</p>
+            <div class="json-code" id="jsonCode"></div>
+            <button class="btn btn-primary copy-btn" onclick="copyJsonCode()">复制代码</button>
+        </div>
+    </div>
+    
+    <script>
+        // 允许登录的手机号列表
+        const ALLOWED_PHONES = ['13650400070', '18827064583'];
+        
+        // 检查是否已登录
+        function checkLoginStatus() {
+            const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
+            if (isLoggedIn === 'true') {
+                showAdminPage();
+            } else {
+                showLoginPage();
+            }
+        }
+        
+        // 显示登录页面
+        function showLoginPage() {
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('adminPage').classList.remove('show');
+            // 聚焦到输入框
+            setTimeout(() => {
+                document.getElementById('phoneInput').focus();
+            }, 100);
+        }
+        
+        // 显示管理页面
+        function showAdminPage() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('adminPage').classList.add('show');
+            // 加载产品数据
+            loadProductsFromLocalStorage();
+        }
+        
+        // 处理登录
+        function handleLogin() {
+            const phoneInput = document.getElementById('phoneInput');
+            const loginError = document.getElementById('loginError');
+            const phone = phoneInput.value.trim();
+            
+            // 验证手机号
+            if (ALLOWED_PHONES.includes(phone)) {
+                // 登录成功
+                sessionStorage.setItem('adminLoggedIn', 'true');
+                phoneInput.value = '';
+                loginError.classList.remove('show');
+                showAdminPage();
+            } else {
+                // 登录失败
+                loginError.classList.add('show');
+                phoneInput.value = '';
+                phoneInput.focus();
+            }
+        }
+        
+        // 页面加载时检查登录状态
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+        });
+        
+        // 全局变量
+        let productsData = { products: [] };
+        let uploadedImages = []; // 存储上传的轮播图（Base64格式）
+        let uploadedSizeImage = null; // 存储上传的详情图（Base64格式）
+        
+        // 初始化 - 优先从 LocalStorage 加载
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProductsFromLocalStorage();
+        });
+        
+        // 从 LocalStorage 加载产品数据
+        function loadProductsFromLocalStorage() {
+            try {
+                // 优先从 LocalStorage 读取
+                const localData = localStorage.getItem('productsData');
+                if (localData) {
+                    productsData = JSON.parse(localData);
+                    renderProductList();
+                } else {
+                    // 如果 LocalStorage 没有数据，从文件加载
+                    loadProductsFromFile();
+                }
+            } catch (error) {
+                console.error('加载产品数据失败:', error);
+                loadProductsFromFile();
+            }
+        }
+        
+        // 从文件加载产品数据（备用）
+        async function loadProductsFromFile() {
+            try {
+                const response = await fetch('products-data.json');
+                if (response.ok) {
+                    productsData = await response.json();
+                    // 保存到 LocalStorage
+                    saveToLocalStorage();
+                    renderProductList();
+                } else {
+                    console.warn('products-data.json 不存在，使用空数据');
+                    productsData = { products: [] };
+                    renderProductList();
+                }
+            } catch (error) {
+                console.error('加载产品数据失败:', error);
+                productsData = { products: [] };
+                renderProductList();
+            }
+        }
+        
+        // 保存到 LocalStorage
+        function saveToLocalStorage() {
+            try {
+                localStorage.setItem('productsData', JSON.stringify(productsData));
+            } catch (error) {
+                console.error('保存到 LocalStorage 失败:', error);
+            }
+        }
+        function switchTab(tabName) {
+            // 隐藏所有标签内容
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 显示选中的标签
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            
+            // 找到对应的标签按钮并高亮
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                if ((tabName === 'add' && tab.textContent.includes('添加')) ||
+                    (tabName === 'manage' && tab.textContent.includes('管理'))) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            if (tabName === 'manage') {
+                renderProductList();
+            }
+        }
+        
+        // 加载产品数据
+        async function loadProducts() {
+            try {
+                const response = await fetch('products-data.json');
+                if (response.ok) {
+                    productsData = await response.json();
+                    renderProductList();
+                } else {
+                    console.warn('products-data.json 不存在，使用空数据');
+                    productsData = { products: [] };
+                    renderProductList();
+                }
+            } catch (error) {
+                console.error('加载产品数据失败:', error);
+                productsData = { products: [] };
+                renderProductList();
+            }
+        }
+        
+        // 渲染产品列表
+        function renderProductList() {
+            const productList = document.getElementById('productList');
+            productList.innerHTML = '';
+            
+            if (productsData.products.length === 0) {
+                productList.innerHTML = '<p>暂无产品数据</p>';
+                return;
+            }
+            
+            productsData.products.forEach((product, index) => {
+                const productDiv = document.createElement('div');
+                productDiv.className = 'product-item';
+                productDiv.innerHTML = `
+                    <h3>${product.name}</h3>
+                    <p><strong>产品描述：</strong></p>
+                    <pre>${product.description.zh}</pre>
+                    <div class="product-actions">
+                        <button class="btn btn-primary" onclick="editProduct(${index})">编辑</button>
+                        <button class="btn btn-danger" onclick="deleteProduct(${index})">删除</button>
+                    </div>
+                `;
+                productList.appendChild(productDiv);
+            });
+        }
+        
+        // 处理图片上传
+        function handleImageUpload(event) {
+            const files = event.target.files;
+            for (let file of files) {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        // 将图片转换为 Base64 存储
+                        uploadedImages.push({
+                            name: file.name,
+                            data: e.target.result // Base64 数据
+                        });
+                        
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.title = file.name;
+                        document.getElementById('imagePreview').appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        }
+        
+        // 处理详情图上传
+        function handleSizeImageUpload(event) {
+            const file = event.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // 将图片转换为 Base64 存储
+                    uploadedSizeImage = {
+                        name: file.name,
+                        data: e.target.result // Base64 数据
+                    };
+                    
+                    // 清空预览并显示新图片
+                    const preview = document.getElementById('sizeImagePreview');
+                    preview.innerHTML = '';
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.title = file.name;
+                    preview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        // 添加产品
+        function addProduct() {
+            const name = document.getElementById('productName').value.trim();
+            const descriptionZh = document.getElementById('productDescriptionZh').value.trim();
+            
+            if (!name || !descriptionZh) {
+                showNotification('请填写完整的产品信息', 'error');
+                return;
+            }
+            
+            // 检查产品是否已存在
+            const existingIndex = productsData.products.findIndex(p => p.name === name);
+            if (existingIndex >= 0) {
+                showNotification('产品已存在，请使用编辑功能或更改产品名称', 'error');
+                return;
+            }
+            
+            // 二次确认
+            const confirmMessage = `确认添加以下产品吗？\n\n产品名称：${name}\n产品描述：${descriptionZh.substring(0, 50)}${descriptionZh.length > 50 ? '...' : ''}`;
+            
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+            
+            // 生成图片数组（存储 Base64 数据）
+            const images = uploadedImages.map(img => img.data);
+            
+            const newProduct = {
+                id: name,
+                name: name,
+                description: {
+                    zh: descriptionZh,
+                    en: descriptionZh // 使用中文描述作为英文描述
+                },
+                images: images,
+                imagesBase64: true, // 标记图片为 Base64 格式
+                sizeImage: uploadedSizeImage ? uploadedSizeImage.data : null, // 保存详情图
+                sizeImageBase64: uploadedSizeImage ? true : false // 标记详情图为 Base64 格式
+            };
+            
+            productsData.products.push(newProduct);
+            
+            // 保存到 LocalStorage
+            saveToLocalStorage();
+            
+            // 清空表单
+            document.getElementById('productName').value = '';
+            document.getElementById('productDescriptionZh').value = '';
+            document.getElementById('imagePreview').innerHTML = '';
+            document.getElementById('sizeImagePreview').innerHTML = '';
+            uploadedImages = [];
+            uploadedSizeImage = null;
+            
+            showNotification('产品添加成功！已自动同步到产品页面', 'success');
+            
+            // 自动切换到管理页面显示新添加的产品
+            setTimeout(() => {
+                switchTab('manage');
+            }, 500);
+        }
+        
+        // 编辑产品
+        function editProduct(index) {
+            const product = productsData.products[index];
+            
+            // 切换到添加标签页并填充数据
+            switchTab('add');
+            
+            document.getElementById('productName').value = product.name;
+            document.getElementById('productDescriptionZh').value = product.description.zh;
+            
+            // 注意：这里不处理图片，因为编辑时图片路径已经确定
+            document.getElementById('imagePreview').innerHTML = '';
+            uploadedImages = [];
+        }
+        
+        // 删除产品
+        function deleteProduct(index) {
+            if (confirm('确定要删除这个产品吗？此操作不可恢复。')) {
+                productsData.products.splice(index, 1);
+                // 保存到 LocalStorage
+                saveToLocalStorage();
+                renderProductList();
+                showNotification('产品删除成功！已自动同步', 'success');
+            }
+        }
+        
+        // 保存产品数据
+        async function saveProducts() {
+            try {
+                // 验证数据
+                if (!productsData.products || productsData.products.length === 0) {
+                    showNotification('没有产品数据可保存', 'error');
+                    return;
+                }
+                
+                // 验证必填字段
+                for (let product of productsData.products) {
+                    if (!product.id || !product.name || !product.description || 
+                        !product.description.zh || !product.description.en) {
+                        showNotification('产品数据不完整，请检查', 'error');
+                        return;
+                    }
+                }
+                
+                // 创建 Blob 对象
+                const blob = new Blob([JSON.stringify(productsData, null, 2)], { type: 'application/json' });
+                
+                // 创建下载链接
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'products-data.json';
+                document.body.appendChild(a);
+                a.click();
+                
+                // 清理
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+                
+                showNotification('JSON 文件已下载！请替换项目根目录下的 products-data.json 文件', 'success');
+            } catch (error) {
+                console.error('保存产品数据失败:', error);
+                showNotification('保存产品数据失败: ' + error.message, 'error');
+            }
+        }
+        
+        // 显示通知
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // 显示 JSON 代码
+        function showJsonCode() {
+            if (!productsData.products || productsData.products.length === 0) {
+                showNotification('没有产品数据可生成', 'error');
+                return;
+            }
+            
+            const jsonString = JSON.stringify(productsData, null, 2);
+            document.getElementById('jsonCode').textContent = jsonString;
+            document.getElementById('jsonModal').classList.add('show');
+        }
+        
+        // 关闭 JSON 模态框
+        function closeJsonModal() {
+            document.getElementById('jsonModal').classList.remove('show');
+        }
+        
+        // 复制 JSON 代码
+        async function copyJsonCode() {
+            const jsonCode = document.getElementById('jsonCode').textContent;
+            
+            try {
+                await navigator.clipboard.writeText(jsonCode);
+                showNotification('代码已复制到剪贴板！请粘贴到 products-data.json 文件', 'success');
+            } catch (err) {
+                // 备用方案
+                const textArea = document.createElement('textarea');
+                textArea.value = jsonCode;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showNotification('代码已复制到剪贴板！请粘贴到 products-data.json 文件', 'success');
+            }
+        }
+        
+        // 拖拽上传功能
+        const uploadArea = document.querySelector('.image-upload');
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#2196F3';
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = '#ddd';
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#ddd';
+            
+            const files = e.dataTransfer.files;
+            for (let file of files) {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        // 将图片转换为 Base64 存储
+                        uploadedImages.push({
+                            name: file.name,
+                            data: e.target.result // Base64 数据
+                        });
+                        
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.title = file.name;
+                        document.getElementById('imagePreview').appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
