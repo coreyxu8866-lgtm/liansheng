@@ -793,6 +793,44 @@
 
             card.appendChild(imgContainer);
             card.appendChild(infoContainer);
+
+            // 添加自动轮播逻辑
+            if (imageUrls.length > 1) {
+                let currentIndex = 0;
+                let autoPlayTimer = null;
+                const intervalTime = 3000 + Math.random() * 2000; // 随机 3-5 秒，避免所有卡片同步切换
+
+                const startAutoPlay = () => {
+                    if (autoPlayTimer) return;
+                    autoPlayTimer = setInterval(() => {
+                        currentIndex = (currentIndex + 1) % imageUrls.length;
+                        switchProductImg(imgContainer, indicators, currentIndex);
+                        lazyLoadImage(imgContainer.querySelectorAll('img')[currentIndex]);
+                    }, intervalTime);
+                };
+
+                const stopAutoPlay = () => {
+                    if (autoPlayTimer) {
+                        clearInterval(autoPlayTimer);
+                        autoPlayTimer = null;
+                    }
+                };
+
+                // 鼠标悬停停止，离开开始
+                card.addEventListener('mouseenter', stopAutoPlay);
+                card.addEventListener('mouseleave', startAutoPlay);
+
+                // 初始启动
+                startAutoPlay();
+                
+                // 点击指示器时重置索引
+                indicators.querySelectorAll('span').forEach((dot, idx) => {
+                    dot.addEventListener('click', () => {
+                        currentIndex = idx;
+                    });
+                });
+            }
+
             return card;
         }
 

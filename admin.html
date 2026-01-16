@@ -138,10 +138,6 @@
             margin: 0 auto;
         }
         
-        .admin-content {
-            /* 移除网格布局，改为普通布局 */
-        }
-        
         .form-section {
             background: white;
             padding: 30px;
@@ -512,13 +508,11 @@
     </div>
     
     <script>
-        // 允许登录的手机号哈希列表 (SHA-256)
         const ALLOWED_HASHES = [
             '6abac760fe18596c6f87d870a4cc1913f03fb7d42d8b7cb3401dc1aaed0f6972',
             '4217c69a8afdc07367cef54b3977d2de2836b2f80166e78be0487882ca77bd86'
         ];
         
-        // 计算字符串的 SHA-256 哈希值
         async function sha256(message) {
             const msgBuffer = new TextEncoder().encode(message);
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);

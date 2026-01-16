@@ -255,34 +255,6 @@
         .icon-card:hover p {
             color: #fff;
         }
-        /* 返回顶部按钮 */
-        .back-to-top {
-            position: fixed;
-            right: 30px;
-            bottom: 30px;
-            width: 50px;
-            height: 50px;
-            background: #2196F3;
-            border: none;
-            border-radius: 50%;
-            color: #fff;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
-            transition: all 0.3s ease;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-        }
-        .back-to-top.show {
-            opacity: 1;
-            visibility: visible;
-        }
-        .back-to-top:hover {
-            background: #1976D2;
-            transform: translateY(-5px);
-            box-shadow: 0 6px 16px rgba(33, 150, 243, 0.5);
-        }
         /* 响应式适配：移动端调整 */
         @media (max-width: 768px) {
             .banner {
@@ -298,13 +270,6 @@
             }
             .banner-arrow.next {
                 right: 10px;
-            }
-            .back-to-top {
-                right: 20px;
-                bottom: 20px;
-                width: 45px;
-                height: 45px;
-                font-size: 20px;
             }
             .icons-container {
                 flex-direction: column;
@@ -397,9 +362,6 @@
         </div>
     </div>
 
-    <!-- 返回顶部按钮 -->
-    <button class="back-to-top" id="backToTop" aria-label="返回顶部">↑</button>
-
     <!-- JS逻辑（保持不变） -->
     <script>
         // 轮播图逻辑
@@ -484,25 +446,6 @@
                 isChinese = !isChinese;
             });
 
-            // 返回顶部按钮逻辑
-            const backToTopBtn = document.getElementById('backToTop');
-            
-            // 监听滚动事件，显示/隐藏按钮
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 300) {
-                    backToTopBtn.classList.add('show');
-                } else {
-                    backToTopBtn.classList.remove('show');
-                }
-            });
-            
-            // 点击返回顶部
-            backToTopBtn.addEventListener('click', () => {
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-            });
         });
     </script>
 </body>
