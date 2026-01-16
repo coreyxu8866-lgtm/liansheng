@@ -508,17 +508,16 @@
                     // 构建图片 URL
                     let imageUrls = [];
                     
-                    // 判断图片是 Base64 格式还是文件路径
-                    if (product.imagesBase64 && product.images && product.images.length > 0) {
-                        // Base64 格式的图片，直接使用
-                        imageUrls = product.images;
-
-                    } else if (product.images && product.images.length > 0) {
-                        // 文件路径格式的图片
-                        imageUrls = product.images.map(img => 
-                            encodeURI(`images/products/${product.id}/p_png/${img}`)
-                        );
-
+                    // 判断图片格式并构建 URL
+                    if (product.images && product.images.length > 0) {
+                        imageUrls = product.images.map(img => {
+                            if (typeof img === 'string' && img.startsWith('data:')) {
+                                return img; // Base64 直接返回
+                            } else {
+                                // 文件名则构建完整路径
+                                return encodeURI(`images/products/${product.id}/p_png/${img}`);
+                            }
+                        });
                     } else {
                         // 如果没有图片，使用占位图
                         const placeholderSvg = `
@@ -529,7 +528,6 @@
                             </svg>
                         `;
                         imageUrls = [`data:image/svg+xml;charset=utf-8,${encodeURIComponent(placeholderSvg)}`];
-
                     }
                     
                     // 直接创建产品卡片
@@ -1004,9 +1002,14 @@ isDragging = false;
                         const data = JSON.parse(localData);
                         const product = data.products.find(p => p.name === productName);
                         
-                        // 如果找到产品并且有 Base64 详情图
-                        if (product && product.sizeImageBase64 && product.sizeImage) {
-                            resolve([product.sizeImage]);
+                        // 如果找到产品并且有详情图
+                        if (product && product.sizeImage) {
+                            if (typeof product.sizeImage === 'string' && product.sizeImage.startsWith('data:')) {
+                                resolve([product.sizeImage]);
+                            } else {
+                                // 如果是文件名，则构建路径
+                                resolve([encodeURI(`images/products/${product.name}/size/${product.sizeImage}`)]);
+                            }
                             return;
                         }
                     }

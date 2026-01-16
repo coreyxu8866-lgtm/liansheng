@@ -112,13 +112,25 @@
         
         .admin-header {
             background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
+            padding: 15px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .logo img {
+            height: 45px;
+            width: auto;
+            display: block;
         }
         
         .admin-container {
@@ -132,73 +144,98 @@
         
         .form-section {
             background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-            max-width: 800px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            max-width: 900px;
             margin: 0 auto;
         }
         
         .preview-section {
             background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-            max-width: 1000px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            max-width: 1100px;
             margin: 0 auto;
         }
         
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 25px;
         }
         
         .form-group label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #333;
+            font-size: 15px;
         }
         
         .form-group input,
         .form-group textarea {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
             font-size: 14px;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #2196F3;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+            outline: none;
         }
         
         .form-group textarea {
-            height: 100px;
-            resize: vertical;
+            height: 120px;
+            line-height: 1.6;
         }
         
         .image-upload {
-            border: 2px dashed #ddd;
-            padding: 20px;
+            border: 2px dashed #e0e0e0;
+            padding: 40px 20px;
             text-align: center;
-            border-radius: 4px;
+            border-radius: 12px;
             cursor: pointer;
-            transition: border-color 0.3s;
+            transition: all 0.3s;
+            background: #fafafa;
+            color: #666;
         }
         
         .image-upload:hover {
             border-color: #2196F3;
+            background: rgba(33, 150, 243, 0.02);
+            color: #2196F3;
+        }
+        
+        .image-upload p {
+            font-size: 14px;
+            margin: 0;
         }
         
         .image-preview {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
         }
         
         .image-preview img {
-            width: 80px;
-            height: 60px;
+            width: 100%;
+            aspect-ratio: 4/3;
             object-fit: cover;
-            border-radius: 4px;
-            border: 1px solid #ddd;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            transition: transform 0.2s;
+        }
+        
+        .image-preview img:hover {
+            transform: scale(1.05);
         }
         
         .btn {
@@ -284,25 +321,29 @@
         
         .tabs {
             display: flex;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #ddd;
+            margin-bottom: 30px;
+            background: #eee;
+            padding: 5px;
+            border-radius: 10px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
         }
         
         .tab {
-            padding: 10px 20px;
+            padding: 10px 25px;
             cursor: pointer;
-            border: 1px solid #ddd;
-            border-bottom: none;
-            background: #f8f9fa;
-            border-radius: 4px 4px 0 0;
-            margin-right: 5px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-size: 15px;
+            color: #666;
         }
         
         .tab.active {
             background: white;
-            border-bottom: 1px solid white;
-            margin-bottom: -1px;
-            font-weight: bold;
+            color: #2196F3;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            font-weight: 600;
         }
         
         .tab-content {
@@ -400,10 +441,11 @@
     <div class="admin-page" id="adminPage">
     <div class="admin-container">
         <div class="admin-header">
-            <h1>产品管理后台</h1>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn btn-primary" onclick="showJsonCode()">生成代码</button>
-                <button class="btn btn-success" onclick="saveProducts()">下载 JSON</button>
+            <div class="header-left">
+                <div class="logo">
+                    <img src="images/452e2527b5fb86f21132d0cc7d32ff92.jpg" alt="联胜照明logo">
+                </div>
+                <h1>产品管理后台</h1>
             </div>
         </div>
         
@@ -470,8 +512,20 @@
     </div>
     
     <script>
-        // 允许登录的手机号列表
-        const ALLOWED_PHONES = ['13650400070', '18827064583'];
+        // 允许登录的手机号哈希列表 (SHA-256)
+        const ALLOWED_HASHES = [
+            '6abac760fe18596c6f87d870a4cc1913f03fb7d42d8b7cb3401dc1aaed0f6972',
+            '4217c69a8afdc07367cef54b3977d2de2836b2f80166e78be0487882ca77bd86'
+        ];
+        
+        // 计算字符串的 SHA-256 哈希值
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
+        }
         
         // 检查是否已登录
         function checkLoginStatus() {
@@ -502,13 +556,18 @@
         }
         
         // 处理登录
-        function handleLogin() {
+        async function handleLogin() {
             const phoneInput = document.getElementById('phoneInput');
             const loginError = document.getElementById('loginError');
             const phone = phoneInput.value.trim();
             
-            // 验证手机号
-            if (ALLOWED_PHONES.includes(phone)) {
+            if (!phone) return;
+            
+            // 计算输入手机号的哈希值
+            const hashedInput = await sha256(phone);
+            
+            // 验证哈希值
+            if (ALLOWED_HASHES.includes(hashedInput)) {
                 // 登录成功
                 sessionStorage.setItem('adminLoggedIn', 'true');
                 phoneInput.value = '';
@@ -531,6 +590,7 @@
         let productsData = { products: [] };
         let uploadedImages = []; // 存储上传的轮播图（Base64格式）
         let uploadedSizeImage = null; // 存储上传的详情图（Base64格式）
+        let editingIndex = -1; // 当前正在编辑的产品索引，-1 表示新增模式
         
         // 初始化 - 优先从 LocalStorage 加载
         document.addEventListener('DOMContentLoaded', function() {
@@ -585,6 +645,12 @@
             }
         }
         function switchTab(tabName) {
+            // 如果切换到“添加”标签且不是编辑模式，确保标题和按钮正确
+            if (tabName === 'add' && editingIndex === -1) {
+                document.querySelector('#add-tab h2').textContent = '添加新产品';
+                document.querySelector('#add-tab .btn-primary').textContent = '添加产品';
+            }
+            
             // 隐藏所有标签内容
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
@@ -702,7 +768,7 @@
             }
         }
         
-        // 添加产品
+        // 添加或修改产品
         function addProduct() {
             const name = document.getElementById('productName').value.trim();
             const descriptionZh = document.getElementById('productDescriptionZh').value.trim();
@@ -712,15 +778,20 @@
                 return;
             }
             
-            // 检查产品是否已存在
-            const existingIndex = productsData.products.findIndex(p => p.name === name);
+            // 检查产品是否已存在（编辑模式下排除自身）
+            const existingIndex = productsData.products.findIndex((p, idx) => p.name === name && idx !== editingIndex);
             if (existingIndex >= 0) {
-                showNotification('产品已存在，请使用编辑功能或更改产品名称', 'error');
+                showNotification('产品名称已存在，请更改产品名称', 'error');
                 return;
             }
             
             // 二次确认
-            const confirmMessage = `确认添加以下产品吗？\n\n产品名称：${name}\n产品描述：${descriptionZh.substring(0, 50)}${descriptionZh.length > 50 ? '...' : ''}`;
+            let confirmMessage = '';
+            if (editingIndex >= 0) {
+                confirmMessage = `确认修改产品“${productsData.products[editingIndex].name}”吗？`;
+            } else {
+                confirmMessage = `确认添加以下产品吗？\n\n产品名称：${name}\n产品描述：${descriptionZh.substring(0, 50)}${descriptionZh.length > 50 ? '...' : ''}`;
+            }
             
             if (!confirm(confirmMessage)) {
                 return;
@@ -729,7 +800,7 @@
             // 生成图片数组（存储 Base64 数据）
             const images = uploadedImages.map(img => img.data);
             
-            const newProduct = {
+            const productData = {
                 id: name,
                 name: name,
                 description: {
@@ -742,12 +813,31 @@
                 sizeImageBase64: uploadedSizeImage ? true : false // 标记详情图为 Base64 格式
             };
             
-            productsData.products.push(newProduct);
+            if (editingIndex >= 0) {
+                // 编辑模式：更新现有产品
+                productsData.products[editingIndex] = productData;
+                showNotification('产品修改成功！', 'success');
+            } else {
+                // 新增模式：添加新产品
+                productsData.products.push(productData);
+                showNotification('产品添加成功！已自动同步到产品页面', 'success');
+            }
             
             // 保存到 LocalStorage
             saveToLocalStorage();
             
-            // 清空表单
+            // 清空表单并重置状态
+            clearForm();
+            
+            // 自动切换到管理页面
+            setTimeout(() => {
+                switchTab('manage');
+            }, 500);
+        }
+        
+        // 清空表单
+        function clearForm() {
+            editingIndex = -1;
             document.getElementById('productName').value = '';
             document.getElementById('productDescriptionZh').value = '';
             document.getElementById('imagePreview').innerHTML = '';
@@ -755,27 +845,67 @@
             uploadedImages = [];
             uploadedSizeImage = null;
             
-            showNotification('产品添加成功！已自动同步到产品页面', 'success');
-            
-            // 自动切换到管理页面显示新添加的产品
-            setTimeout(() => {
-                switchTab('manage');
-            }, 500);
+            // 恢复标题和按钮文本
+            document.querySelector('#add-tab h2').textContent = '添加新产品';
+            document.querySelector('#add-tab .btn-primary').textContent = '添加产品';
         }
         
         // 编辑产品
         function editProduct(index) {
+            editingIndex = index;
             const product = productsData.products[index];
             
             // 切换到添加标签页并填充数据
             switchTab('add');
             
+            // 修改标题和按钮文本
+            document.querySelector('#add-tab h2').textContent = '编辑产品';
+            document.querySelector('#add-tab .btn-primary').textContent = '保存修改';
+            
             document.getElementById('productName').value = product.name;
             document.getElementById('productDescriptionZh').value = product.description.zh;
             
-            // 注意：这里不处理图片，因为编辑时图片路径已经确定
-            document.getElementById('imagePreview').innerHTML = '';
+            // 处理轮播图预览
+            const imagePreview = document.getElementById('imagePreview');
+            imagePreview.innerHTML = '';
             uploadedImages = [];
+            
+            if (product.images && product.images.length > 0) {
+                product.images.forEach((imgData, imgIdx) => {
+                    uploadedImages.push({
+                        name: `image_${imgIdx}`,
+                        data: imgData
+                    });
+                    const img = document.createElement('img');
+                    // 如果图片数据不是 Base64，则构建正确的文件路径
+                    if (typeof imgData === 'string' && imgData.startsWith('data:')) {
+                        img.src = imgData;
+                    } else {
+                        img.src = encodeURI(`images/products/${product.id}/p_png/${imgData}`);
+                    }
+                    imagePreview.appendChild(img);
+                });
+            }
+            
+            // 处理详情图预览
+            const sizeImagePreview = document.getElementById('sizeImagePreview');
+            sizeImagePreview.innerHTML = '';
+            uploadedSizeImage = null;
+            
+            if (product.sizeImage) {
+                uploadedSizeImage = {
+                    name: 'size_image',
+                    data: product.sizeImage
+                };
+                const img = document.createElement('img');
+                // 如果图片数据不是 Base64，则构建正确的文件路径
+                if (typeof product.sizeImage === 'string' && product.sizeImage.startsWith('data:')) {
+                    img.src = product.sizeImage;
+                } else {
+                    img.src = encodeURI(`images/products/${product.name}/size/${product.sizeImage}`);
+                }
+                sizeImagePreview.appendChild(img);
+            }
         }
         
         // 删除产品
