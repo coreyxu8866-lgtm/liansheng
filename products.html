@@ -511,8 +511,8 @@
                     // 判断图片格式并构建 URL
                     if (product.images && product.images.length > 0) {
                         imageUrls = product.images.map(img => {
-                            if (typeof img === 'string' && img.startsWith('data:')) {
-                                return img; // Base64 直接返回
+                            if (typeof img === 'string' && (img.startsWith('data:') || img.startsWith('http') || img.startsWith('images/'))) {
+                                return img; // Base64 或 已有路径直接返回
                             } else {
                                 // 文件名则构建完整路径
                                 return encodeURI(`images/products/${product.id}/p_png/${img}`);
@@ -905,7 +905,7 @@
                     currentSizeIndex = 0;
                     modalImg.src = currentSizeImages[currentSizeIndex];
                     modalImg.onload = () => {
-isDragging = false;
+                        isDragging = false;
                         touchStartDistance = 0;
                         modalImg.style.display = 'block';
                     };
@@ -1042,7 +1042,7 @@ isDragging = false;
                         
                         // 如果找到产品并且有详情图
                         if (product && product.sizeImage) {
-                            if (typeof product.sizeImage === 'string' && product.sizeImage.startsWith('data:')) {
+                            if (typeof product.sizeImage === 'string' && (product.sizeImage.startsWith('data:') || product.sizeImage.startsWith('images/') || product.sizeImage.startsWith('http'))) {
                                 resolve([product.sizeImage]);
                             } else {
                                 // 如果是文件名，则构建路径

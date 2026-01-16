@@ -216,22 +216,54 @@
         
         .image-preview {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             gap: 15px;
             margin-top: 15px;
         }
         
-        .image-preview img {
+        .preview-item {
+            position: relative;
             width: 100%;
             aspect-ratio: 4/3;
+        }
+        
+        .preview-item img {
+            width: 100%;
+            height: 100%;
             object-fit: cover;
             border-radius: 8px;
             border: 1px solid #eee;
             transition: transform 0.2s;
         }
         
-        .image-preview img:hover {
-            transform: scale(1.05);
+        .preview-item:hover img {
+            transform: scale(1.02);
+        }
+        
+        .delete-btn {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            background: #f44336;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 10;
+            border: 2px solid white;
+            transition: all 0.2s;
+        }
+        
+        .delete-btn:hover {
+            background: #da190b;
+            transform: scale(1.1);
         }
         
         .btn {
@@ -718,6 +750,9 @@
         // 处理图片上传
         function handleImageUpload(event) {
             const files = event.target.files;
+            let loadedCount = 0;
+            const totalFiles = files.length;
+            
             for (let file of files) {
                 if (file.type.startsWith('image/')) {
                     const reader = new FileReader();
@@ -728,14 +763,51 @@
                             data: e.target.result // Base64 数据
                         });
                         
-                        const img = document.createElement('img');
-                        img.src = e.target.result;
-                        img.title = file.name;
-                        document.getElementById('imagePreview').appendChild(img);
+                        loadedCount++;
+                        if (loadedCount === totalFiles) {
+                            renderUploadedImages();
+                        }
                     };
                     reader.readAsDataURL(file);
+                } else {
+                    loadedCount++;
                 }
             }
+            // 重置 input，允许重复上传相同文件
+            event.target.value = '';
+        }
+        
+        // 渲染轮播图预览
+        function renderUploadedImages() {
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = '';
+            
+            uploadedImages.forEach((imgObj, index) => {
+                const item = document.createElement('div');
+                item.className = 'preview-item';
+                
+                const img = document.createElement('img');
+                img.src = imgObj.data;
+                img.title = imgObj.name;
+                
+                const deleteBtn = document.createElement('div');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.innerHTML = '&times;';
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    removeUploadedImage(index);
+                };
+                
+                item.appendChild(img);
+                item.appendChild(deleteBtn);
+                preview.appendChild(item);
+            });
+        }
+        
+        // 删除轮播图
+        function removeUploadedImage(index) {
+            uploadedImages.splice(index, 1);
+            renderUploadedImages();
         }
         
         // 处理详情图上传
@@ -749,17 +821,44 @@
                         name: file.name,
                         data: e.target.result // Base64 数据
                     };
-                    
-                    // 清空预览并显示新图片
-                    const preview = document.getElementById('sizeImagePreview');
-                    preview.innerHTML = '';
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.title = file.name;
-                    preview.appendChild(img);
+                    renderSizeImage();
                 };
                 reader.readAsDataURL(file);
             }
+            event.target.value = '';
+        }
+        
+        // 渲染详情图预览
+        function renderSizeImage() {
+            const preview = document.getElementById('sizeImagePreview');
+            preview.innerHTML = '';
+            
+            if (uploadedSizeImage) {
+                const item = document.createElement('div');
+                item.className = 'preview-item';
+                
+                const img = document.createElement('img');
+                img.src = uploadedSizeImage.data;
+                img.title = uploadedSizeImage.name;
+                
+                const deleteBtn = document.createElement('div');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.innerHTML = '&times;';
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    removeSizeImage();
+                };
+                
+                item.appendChild(img);
+                item.appendChild(deleteBtn);
+                preview.appendChild(item);
+            }
+        }
+        
+        // 删除详情图
+        function removeSizeImage() {
+            uploadedSizeImage = null;
+            renderSizeImage();
         }
         
         // 添加或修改产品
@@ -791,8 +890,8 @@
                 return;
             }
             
-            // 生成图片数组（存储 Base64 数据）
-            const images = uploadedImages.map(img => img.data);
+            // 生成图片数组（优先使用 original 原始值，如果没有则使用 data）
+            const images = uploadedImages.map(img => img.original || img.data);
             
             const productData = {
                 id: name,
@@ -802,9 +901,9 @@
                     en: descriptionZh // 使用中文描述作为英文描述
                 },
                 images: images,
-                imagesBase64: true, // 标记图片为 Base64 格式
-                sizeImage: uploadedSizeImage ? uploadedSizeImage.data : null, // 保存详情图
-                sizeImageBase64: uploadedSizeImage ? true : false // 标记详情图为 Base64 格式
+                imagesBase64: true, // 标记包含 Base64 数据
+                sizeImage: uploadedSizeImage ? (uploadedSizeImage.original || uploadedSizeImage.data) : null,
+                sizeImageBase64: uploadedSizeImage ? true : false
             };
             
             if (editingIndex >= 0) {
@@ -860,46 +959,59 @@
             document.getElementById('productDescriptionZh').value = product.description.zh;
             
             // 处理轮播图预览
-            const imagePreview = document.getElementById('imagePreview');
-            imagePreview.innerHTML = '';
             uploadedImages = [];
             
             if (product.images && product.images.length > 0) {
                 product.images.forEach((imgData, imgIdx) => {
+                    let displaySrc = imgData;
+                    let originalValue = imgData;
+                    
+                    // 如果不是 Base64，说明是文件名，记录原始文件名用于保存，构建完整路径用于显示
+                    if (!(typeof imgData === 'string' && imgData.startsWith('data:'))) {
+                        // 检查是否已经是路径
+                        if (imgData.startsWith('images/') || imgData.startsWith('http')) {
+                            displaySrc = imgData;
+                            originalValue = imgData;
+                        } else {
+                            displaySrc = encodeURI(`images/products/${product.id}/p_png/${imgData}`);
+                            originalValue = imgData; // 保持为文件名，如 "p1.png"
+                        }
+                    }
+                    
                     uploadedImages.push({
                         name: `image_${imgIdx}`,
-                        data: imgData
+                        data: displaySrc,
+                        original: originalValue // 新增字段：存储原始值（文件名或Base64）
                     });
-                    const img = document.createElement('img');
-                    // 如果图片数据不是 Base64，则构建正确的文件路径
-                    if (typeof imgData === 'string' && imgData.startsWith('data:')) {
-                        img.src = imgData;
-                    } else {
-                        img.src = encodeURI(`images/products/${product.id}/p_png/${imgData}`);
-                    }
-                    imagePreview.appendChild(img);
                 });
             }
+            renderUploadedImages();
             
             // 处理详情图预览
-            const sizeImagePreview = document.getElementById('sizeImagePreview');
-            sizeImagePreview.innerHTML = '';
             uploadedSizeImage = null;
             
             if (product.sizeImage) {
+                let displaySizeSrc = product.sizeImage;
+                let originalSizeValue = product.sizeImage;
+                
+                if (!(typeof product.sizeImage === 'string' && product.sizeImage.startsWith('data:'))) {
+                    // 检查是否已经是路径
+                    if (product.sizeImage.startsWith('images/') || product.sizeImage.startsWith('http')) {
+                        displaySizeSrc = product.sizeImage;
+                        originalSizeValue = product.sizeImage;
+                    } else {
+                        displaySizeSrc = encodeURI(`images/products/${product.name}/size/${product.sizeImage}`);
+                        originalSizeValue = product.sizeImage;
+                    }
+                }
+                
                 uploadedSizeImage = {
                     name: 'size_image',
-                    data: product.sizeImage
+                    data: displaySizeSrc,
+                    original: originalSizeValue
                 };
-                const img = document.createElement('img');
-                // 如果图片数据不是 Base64，则构建正确的文件路径
-                if (typeof product.sizeImage === 'string' && product.sizeImage.startsWith('data:')) {
-                    img.src = product.sizeImage;
-                } else {
-                    img.src = encodeURI(`images/products/${product.name}/size/${product.sizeImage}`);
-                }
-                sizeImagePreview.appendChild(img);
             }
+            renderSizeImage();
         }
         
         // 删除产品
@@ -1018,6 +1130,9 @@
             uploadArea.style.borderColor = '#ddd';
             
             const files = e.dataTransfer.files;
+            let loadedCount = 0;
+            const totalFiles = files.length;
+            
             for (let file of files) {
                 if (file.type.startsWith('image/')) {
                     const reader = new FileReader();
@@ -1028,12 +1143,14 @@
                             data: e.target.result // Base64 数据
                         });
                         
-                        const img = document.createElement('img');
-                        img.src = e.target.result;
-                        img.title = file.name;
-                        document.getElementById('imagePreview').appendChild(img);
+                        loadedCount++;
+                        if (loadedCount === totalFiles) {
+                            renderUploadedImages();
+                        }
                     };
                     reader.readAsDataURL(file);
+                } else {
+                    loadedCount++;
                 }
             }
         });
