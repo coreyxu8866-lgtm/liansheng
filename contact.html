@@ -112,24 +112,52 @@
             color: #1976D2; /* hover时略深的蓝色，提升交互反馈 */
             text-decoration: underline; /* hover时显示下划线，提示可点击 */
         }
-        /* 响应式适配 */
+        /* 移动端响应式适配 */
         @media (max-width: 768px) {
+            body {
+                padding: 15px 10px;
+            }
+            /* 头部导航适配 */
             .header {
-                flex-wrap: wrap;
+                flex-direction: column;
+                align-items: center;
                 gap: 15px;
+                padding-bottom: 10px;
             }
             .header-left {
-                gap: 20px;
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
                 width: 100%;
+            }
+            .logo {
+                width: 120px;
+                height: 56px;
+            }
+            .nav {
+                display: flex;
                 justify-content: center;
-                margin-bottom: 10px;
+                flex-wrap: wrap;
             }
             .nav a {
                 margin: 0 10px;
                 font-size: 16px;
             }
+            #lang-switch {
+                padding: 6px 12px;
+                font-size: 14px;
+            }
+            /* 联系信息适配 */
+            .contact-section {
+                padding: 0 5px;
+            }
+            .contact-info {
+                font-size: 14px;
+                line-height: 2;
+            }
             .company-name {
                 font-size: 24px; /* 移动端缩小字体，适配屏幕 */
+                margin: 8px 0 12px 0;
             }
         }
     </style>

@@ -257,9 +257,46 @@
             color: #fff;
         }
         /* 响应式适配：移动端调整 */
+        /* 移动端响应式适配 */
         @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            /* 头部导航适配 */
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+                margin-bottom: 20px;
+            }
+            .header-left {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            .logo {
+                width: 150px;
+                height: 70px;
+            }
+            .nav {
+                display: flex;
+                justify-content: center;
+                flex-wrap: wrap;
+                width: 100%;
+            }
+            .nav a {
+                font-size: 16px;
+                margin: 0 10px;
+            }
+            #lang-switch {
+                align-self: center;
+                padding: 6px 12px;
+                font-size: 14px;
+            }
+            /* 轮播图适配 */
             .banner {
                 height: 250px; /* 移动端降低轮播图高度 */
+                margin-bottom: 30px;
             }
             .banner-arrow {
                 width: 40px;
@@ -272,10 +309,33 @@
             .banner-arrow.next {
                 right: 10px;
             }
+            .banner-dots .dot {
+                width: 10px;
+                height: 10px;
+            }
+            /* 公司简介适配 */
+            .company-intro {
+                padding: 0 10px;
+                margin-bottom: 40px;
+            }
+            .company-intro h2 {
+                font-size: 22px;
+                margin-bottom: 20px;
+            }
+            .company-intro p {
+                font-size: 14px;
+                line-height: 1.8;
+            }
+            /* 核心优势适配 */
+            .core-advantages h2 {
+                font-size: 22px;
+                padding: 0 10px;
+            }
             .icons-container {
                 flex-direction: column;
                 align-items: center;
                 gap: 20px;
+                padding: 0 10px;
             }
             .icon-card {
                 width: 90%;
@@ -284,6 +344,9 @@
             }
             .icon-card img {
                 max-height: 200px;
+            }
+            .icon-card p {
+                font-size: 16px;
             }
         }
     </style>

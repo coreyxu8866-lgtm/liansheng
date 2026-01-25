@@ -328,45 +328,108 @@
             font-size: 16px;
             color: #666;
         }
-        /* 响应式适配 */
+        /* 移动端响应式适配 */
         @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            /* 头部导航适配 */
             .header {
-                gap: 20px;
-                justify-content: center;
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
             }
             .header-left {
-                gap: 20px;
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            .logo {
+                width: 130px;
+                height: 60px;
+            }
+            .nav {
+                display: flex;
                 justify-content: center;
+                flex-wrap: wrap;
             }
             .nav a {
                 margin: 0 10px;
                 font-size: 16px;
             }
             #lang-switch {
-                margin-top: 10px;
+                padding: 6px 12px;
+                font-size: 14px;
+            }
+            /* 产品中心标题 */
+            .product-center {
+                padding: 0 5px;
             }
             .product-center h2 {
                 font-size: 20px;
-                margin-bottom: 30px;
+                margin-bottom: 20px;
+            }
+            /* 产品卡片列表适配 */
+            .product-list {
+                grid-template-columns: 1fr; /* 移动端单列显示 */
+                gap: 20px;
+            }
+            .product-card {
+                max-width: 100%;
+            }
+            .product-image-container {
+                height: 250px;
+            }
+            .product-info {
+                padding: 15px;
+            }
+            .product-name {
+                font-size: 16px;
+                margin-bottom: 8px;
             }
             .product-desc {
+                font-size: 13px;
                 max-height: calc(1.8em * 3); /* 移动端显示3行 */
             }
             .product-info:hover .product-desc {
                 max-height: 400px;
             }
+            .size-btn {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+            /* 模态框适配 */
             .modal-content {
                 width: 95% !important;
                 height: 90% !important;
+                padding: 10px;
             }
             .modal-close {
                 top: 5px;
                 right: 5px;
                 font-size: 20px;
+                width: 35px;
+                height: 35px;
             }
             .modal-tip {
                 bottom: 5px;
                 font-size: 12px;
+                padding: 5px 10px;
+            }
+            .modal-indicators {
+                gap: 6px;
+                padding: 8px;
+            }
+            .modal-indicator {
+                width: 8px;
+                height: 8px;
+            }
+            /* 加载动画适配 */
+            .loading-overlay {
+                padding: 20px;
+            }
+            .loading-text {
+                font-size: 14px;
             }
         }
         /* 模态框加载动画 */
