@@ -76,6 +76,7 @@
             color: #2196F3;
             font-size: 16px;
             transition: all 0.3s ease;
+            z-index: 1000; /* 确保在最上层 */
         }
         #lang-switch:hover {
             background: #2196F3;
@@ -358,8 +359,12 @@
                 font-size: 16px;
             }
             #lang-switch {
+                position: fixed; /* 固定定位 */
+                top: 15px; /* 距离顶部 */
+                right: 15px; /* 距离右侧 */
                 padding: 6px 12px;
                 font-size: 14px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.15); /* 添加阴影增强层次感 */
             }
             /* 产品中心标题 */
             .product-center {
